@@ -1,0 +1,20 @@
+services:
+  redis:
+    image: redis/redis-stack-server:latest
+    ports:
+      - "9736:6379"
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ./ollama:/root/.ollama
+    tty: true
+    ports:
+      - 7869:11434
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
