@@ -4,17 +4,27 @@ services:
     ports:
       - "9736:6379"
 
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ./ollama:/root/.ollama
-    tty: true
-    ports:
-      - 7869:11434
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
+
+# 1. This is SLOW
+# First time boot needs to download 'llama3' model, 4.7 GB. If docker compose is started by Spring it will fail and stop the container.
+# You have to manually start this container and wait for the model to download.
+#
+# 2. On EVERY application restart (with docker compose), ollama will load again the model into memory.
+# This makes the rest endpoints "hang" until the next message shows on docker:
+# msg="llama runner started in 149.95 seconds"
+
+#  ollama:
+#    image: ollama/ollama:latest
+#    volumes:
+#      - ./.ollama:/root/.ollama
+#    tty: true
+#    entrypoint: ["/usr/bin/bash", "/root/.ollama/ollama.sh"]
+#    ports:
+#      - 11434
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [ gpu ]
