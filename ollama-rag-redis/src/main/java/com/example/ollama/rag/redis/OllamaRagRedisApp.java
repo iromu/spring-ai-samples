@@ -1,5 +1,6 @@
 package com.example.ollama.rag.redis;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
+@Slf4j
 public class OllamaRagRedisApp {
 
     public static void main(String[] args) {
@@ -38,9 +40,12 @@ public class OllamaRagRedisApp {
 
     @Bean
     ApplicationListener<ApplicationReadyEvent> onApplicationReadyEvent(VectorStore vectorStore,
-                                                                       @Value("classpath:medicaid-wa-faqs.pdf") Resource resource) {
+                                                                       @Value("classpath:medicaid-wa-faqs.pdf") Resource resource,
+                                                                       @Value("${spring.ai.vectorstore.redis.prefix}") String prefix) {
         return _ -> {
-            cleanupRedis((RedisVectorStore) vectorStore);
+
+            if (vectorStore instanceof RedisVectorStore r)
+                cleanupRedis(r, prefix);
 
             var config = PdfDocumentReaderConfig.builder()
                     .withPageExtractedTextFormatter(new ExtractedTextFormatter.Builder()
@@ -53,21 +58,22 @@ public class OllamaRagRedisApp {
         };
     }
 
-    private static void cleanupRedis(RedisVectorStore vectorStore) {
+    private static void cleanupRedis(RedisVectorStore vectorStore, String prefix) {
         var matchingKeys = new HashSet<String>();
-        var params = new ScanParams().match("ollama-rag:*");
+        var params = new ScanParams().match(prefix + "*");
         var nextCursor = "0";
         var jedis = vectorStore.getJedis();
+
         do {
             var scanResult = jedis.scan(nextCursor, params);
-            var keys = scanResult.getResult();
+            matchingKeys.addAll(scanResult.getResult());
             nextCursor = scanResult.getCursor();
-            matchingKeys.addAll(keys);
-
         } while (!nextCursor.equals("0"));
 
         if (!matchingKeys.isEmpty()) {
-            jedis.del(matchingKeys.toArray((new String[0])));
+            String[] array = matchingKeys.toArray((new String[0]));
+            log.info("Deleting keys: {}", array);
+            jedis.del(array);
         }
     }
 
