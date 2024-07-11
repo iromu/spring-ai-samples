@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-public class ChatController {
+class ChatController {
 
     private final Chatbot chatbot;
 
@@ -15,7 +15,7 @@ public class ChatController {
     }
 
     @GetMapping("/api/chat")
-    public Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "Who are you and what should I know about the transition to consumer direct care network washington?") String message) {
+    Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "Who are you and what should I know about the transition to consumer direct care network washington?") String message) {
         return chatbot.stream(message).map(chat -> chat.getResult().getOutput().getContent());
     }
 
