@@ -9,7 +9,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
-import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.RedisVectorStore;
@@ -52,9 +52,11 @@ public class OllamaRagRedisApp {
                             .build())
                     .build();
 
-            var documentReader = new PagePdfDocumentReader(resource, config);
+            var documentReader = new ParagraphPdfDocumentReader(resource, config);
             var textSplitter = new TokenTextSplitter();
-            vectorStore.accept(textSplitter.apply(documentReader.get()));
+            var documentList = textSplitter.apply(documentReader.get());
+            log.info("Adding {} documents to the vector store", documentList.size());
+            vectorStore.accept(documentList);
         };
     }
 
@@ -84,6 +86,7 @@ public class OllamaRagRedisApp {
 }
 
 @Component
+@Slf4j
 class Chatbot {
 
     private static final String SYSTEM_PROMPT_TEMPLATE = """
@@ -117,7 +120,9 @@ class Chatbot {
                 .collect(Collectors.joining(System.lineSeparator()));
         var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
                 .createMessage(Map.of("documents", documents));
+        log.info("The System prompt has {} chars", systemMessage.getContent().length());
         var userMessage = new UserMessage(message);
+        log.info("The User prompt has {} chars", userMessage.getContent().length());
         var prompt = new Prompt(List.of(systemMessage, userMessage));
         return chatModel.stream(prompt);
     }
