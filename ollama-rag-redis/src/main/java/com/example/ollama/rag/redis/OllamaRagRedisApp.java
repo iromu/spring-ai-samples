@@ -12,8 +12,8 @@ import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.ParagraphPdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
-import org.springframework.ai.vectorstore.RedisVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -42,7 +42,7 @@ public class OllamaRagRedisApp {
     ApplicationListener<ApplicationReadyEvent> onApplicationReadyEvent(VectorStore vectorStore,
                                                                        @Value("classpath:medicaid-wa-faqs.pdf") Resource resource,
                                                                        @Value("${spring.ai.vectorstore.redis.prefix}") String prefix) {
-        return _ -> {
+        return e -> {
 
             if (vectorStore instanceof RedisVectorStore r)
                 cleanupRedis(r, prefix);
@@ -116,13 +116,13 @@ class Chatbot {
         List<Document> listOfSimilarDocuments = this.vectorStore.similaritySearch(message);
         var documents = listOfSimilarDocuments
                 .stream()
-                .map(Document::getContent)
+                .map(Document::getText)
                 .collect(Collectors.joining(System.lineSeparator()));
         var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
                 .createMessage(Map.of("documents", documents));
-        log.info("The System prompt has {} chars", systemMessage.getContent().length());
+        log.info("The System prompt has {} chars", systemMessage.getText().length());
         var userMessage = new UserMessage(message);
-        log.info("The User prompt has {} chars", userMessage.getContent().length());
+        log.info("The User prompt has {} chars", userMessage.getText().length());
         var prompt = new Prompt(List.of(systemMessage, userMessage));
         return chatModel.stream(prompt);
     }

@@ -26,7 +26,7 @@ class ChatController {
     @GetMapping("api/chat")
     Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return chatModel.stream(prompt).map(chat -> chat.getResult().getOutput().getContent());
+        return chatModel.stream(prompt).map(chat -> chat.getResult().getOutput().getText());
     }
 
 }
