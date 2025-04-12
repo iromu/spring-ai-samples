@@ -1,15 +1,16 @@
 package com.example.ollama.chat;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@CrossOrigin(origins = "*")
+@Slf4j
 class ChatController {
 
     private final ChatModel chatModel;
@@ -23,10 +24,18 @@ class ChatController {
         return Mono.fromCallable(() -> chatModel.call(message));
     }
 
-    @GetMapping("api/chat")
-    Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        Prompt prompt = new Prompt(new UserMessage(message));
-        return chatModel.stream(prompt).map(chat -> chat.getResult().getOutput().getText());
+    @RequestMapping(value = "api/chat", method = {RequestMethod.GET, RequestMethod.POST})
+    Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message,
+                                @RequestBody(required = false) Input messageBody) {
+        String userMessage = messageBody != null ? messageBody.message : message;
+        log.info("User: {}", userMessage);
+        Prompt prompt = new Prompt(new UserMessage(userMessage));
+        return chatModel.stream(prompt).map(chat -> {
+            log.info("{}", chat.getResult().getOutput().getText());
+            return chat.getResult().getOutput().getText();
+        });
     }
 
+    record Input(String message) {
+    }
 }

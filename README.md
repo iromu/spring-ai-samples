@@ -1,7 +1,7 @@
 ## Setup
 
 For better experience, download ollama from https://ollama.com/download
-and pull llama3 model.
+and pull llama3.1:8b model.
 
 Or you can uncomment the ollama container on compose.yaml
 
