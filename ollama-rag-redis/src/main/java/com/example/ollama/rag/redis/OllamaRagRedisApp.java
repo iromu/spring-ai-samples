@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import redis.clients.jedis.params.ScanParams;
 
 import java.util.HashSet;
@@ -39,10 +41,10 @@ public class OllamaRagRedisApp {
     }
 
     @Bean
-    ApplicationListener<ApplicationReadyEvent> onApplicationReadyEvent(VectorStore vectorStore,
+    ApplicationListener<ApplicationReadyEvent> onApplicationReadyEvent(RedisVectorStore vectorStore,
                                                                        @Value("classpath:medicaid-wa-faqs.pdf") Resource resource,
                                                                        @Value("${spring.ai.vectorstore.redis.prefix}") String prefix) {
-        return e -> {
+        return event -> {
 
             if (vectorStore instanceof RedisVectorStore r)
                 cleanupRedis(r, prefix);
@@ -90,19 +92,19 @@ public class OllamaRagRedisApp {
 class Chatbot {
 
     private static final String SYSTEM_PROMPT_TEMPLATE = """
-                        
+            
             You're assisting with questions about services offered by Carina.
             Carina is a two-sided healthcare marketplace focusing on home care aides (caregivers)
             and their Medicaid in-home care clients (adults and children with developmental disabilities and low income elderly population).
             Carina's mission is to build online tools to bring good jobs to care workers, so care workers can provide the
             best possible care for those who need it.
-                        
+            
             Use the information from the DOCUMENTS section to provide accurate answers but act as if you knew this information innately.
             If unsure, simply state that you don't know.
-                        
+            
             DOCUMENTS:
             {documents}
-                        
+            
             """;
     private final ChatModel chatModel;
     private final VectorStore vectorStore;
@@ -113,17 +115,24 @@ class Chatbot {
     }
 
     public Flux<ChatResponse> stream(String message) {
-        List<Document> listOfSimilarDocuments = this.vectorStore.similaritySearch(message);
-        var documents = listOfSimilarDocuments
-                .stream()
-                .map(Document::getText)
-                .collect(Collectors.joining(System.lineSeparator()));
-        var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
-                .createMessage(Map.of("documents", documents));
-        log.info("The System prompt has {} chars", systemMessage.getText().length());
-        var userMessage = new UserMessage(message);
-        log.info("The User prompt has {} chars", userMessage.getText().length());
-        var prompt = new Prompt(List.of(systemMessage, userMessage));
-        return chatModel.stream(prompt);
+
+        Mono<List<Document>> listMono = Mono.fromCallable(() -> {
+            // Blocking call here
+            return vectorStore.similaritySearch(message);
+        }).subscribeOn(Schedulers.boundedElastic());
+
+        return listMono.flatMapMany(listOfSimilarDocuments -> {
+            var documents = listOfSimilarDocuments
+                    .stream()
+                    .map(Document::getText)
+                    .collect(Collectors.joining(System.lineSeparator()));
+            var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
+                    .createMessage(Map.of("documents", documents));
+            log.info("The System prompt has {} chars", systemMessage.getText().length());
+            var userMessage = new UserMessage(message);
+            log.info("The User prompt has {} chars", userMessage.getText().length());
+            var prompt = new Prompt(List.of(systemMessage, userMessage));
+            return chatModel.stream(prompt);
+        });
     }
 }

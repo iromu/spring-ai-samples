@@ -1,5 +1,6 @@
 services:
-  redis:
+  redis-stack-server:
+    container_name: redis-stack-server
     image: redis/redis-stack-server:latest
     ports:
       - "9736:6379"
