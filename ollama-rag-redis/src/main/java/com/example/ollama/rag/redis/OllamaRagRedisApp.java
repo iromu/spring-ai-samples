@@ -46,8 +46,8 @@ public class OllamaRagRedisApp {
                                                                        @Value("${spring.ai.vectorstore.redis.prefix}") String prefix) {
         return event -> {
 
-            if (vectorStore instanceof RedisVectorStore r)
-                cleanupRedis(r, prefix);
+            //if (vectorStore instanceof RedisVectorStore r)
+            cleanupRedis(vectorStore, prefix);
 
             var config = PdfDocumentReaderConfig.builder()
                     .withPageExtractedTextFormatter(new ExtractedTextFormatter.Builder()
@@ -122,17 +122,20 @@ class Chatbot {
         }).subscribeOn(Schedulers.boundedElastic());
 
         return listMono.flatMapMany(listOfSimilarDocuments -> {
+            log.info("Retrieved {} documents from vectorstore", listOfSimilarDocuments.size());
             var documents = listOfSimilarDocuments
                     .stream()
                     .map(Document::getText)
                     .collect(Collectors.joining(System.lineSeparator()));
+            log.info("The documents context has {} chars", documents.length());
             var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
                     .createMessage(Map.of("documents", documents));
             log.info("The System prompt has {} chars", systemMessage.getText().length());
             var userMessage = new UserMessage(message);
             log.info("The User prompt has {} chars", userMessage.getText().length());
             var prompt = new Prompt(List.of(systemMessage, userMessage));
-            return chatModel.stream(prompt);
+            return chatModel.stream(prompt)
+                    .doOnNext(chatResponse -> log.info("{}", chatResponse.getResult().getOutput().getText()));
         });
     }
 }
