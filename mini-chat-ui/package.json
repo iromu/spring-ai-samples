@@ -1,6 +1,6 @@
 {
   "name": "chat-mini-frontend",
-  "version": "1.0.0",
+  "version": "0.0.1-SNAPSHOT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
