@@ -1,0 +1,27 @@
+# Node / Vue
+node_module
+node
+dist
+.vite
+
+# IDEs and OS
+.idea
+.vscode
+*.log
+.DS_Store
+
+# Maven / Java
+target
+*.iml
+*.class
+
+# Git
+.git
+.gitignore
+docker-compose.yml
+
+# Build files
+*.sh
+*.bat
+*.cmd
+*.swp

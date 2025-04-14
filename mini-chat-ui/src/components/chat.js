@@ -6,11 +6,7 @@ export default function useChat() {
     const messages = ref([])
 
     // The dropdown options for selecting the endpoint
-    const endpoints = [
-        {label: 'Ollama', value: 'http://localhost:7777/api/chat'},
-        {label: 'Ollama RAG Redis', value: 'http://localhost:7778/api/chat'},
-        {label: 'Fake Endpoint 3', value: 'http://localhost:8080/api/fake3'},
-    ]
+    const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
 
     // Default selected endpoint
     const selectedEndpoint = ref(endpoints[0].value)

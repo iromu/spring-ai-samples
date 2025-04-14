@@ -18,7 +18,7 @@
         <module>ollama-chat</module>
         <module>ollama-rag-redis</module>
         <module>ollama-mcp</module>
-        <module>ui</module>
+        <module>mini-chat-ui</module>
     </modules>
 
     <properties>

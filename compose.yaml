@@ -5,6 +5,15 @@ services:
     ports:
       - "9736:6379"
 
+  mini-chat-ui:
+    container_name: mini-chat-ui
+    image: iromu/mini-chat-ui
+    build:
+      context: ./mini-chat-ui
+    #      args:
+    #        - VITE_BACKEND_URL=http://chat-backend:8080
+    ports:
+      - "3000:80"
 
 # 1. This is SLOW
 # First time boot needs to download 'llama3' model, 4.7 GB. If docker compose is started by Spring it will fail and stop the container.
