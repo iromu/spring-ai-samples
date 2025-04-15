@@ -1,6 +1,15 @@
-/* === Global Reset & Box Model Fix === */
-html {
+/* === Global Reset === */
+
+* {
+    font-family: 'VT323', 'Courier New', Courier, monospace !important;
+    font-size: x-large;
+    color: #ff9900; /* Optional: Set the text color to a CRT-style yellow */
+    text-shadow: 0 0 5px #ff9900; /* Optional: Add a CRT-like glow effect */
+}
+
+html, body {
     height: 100%;
+    margin: 0;
     box-sizing: border-box;
 }
 
@@ -8,8 +17,7 @@ html {
     box-sizing: inherit;
 }
 
-/* === CRT Phosphor Theme Base === */
-
+/* === CRT SCANLINES === */
 body::before {
     content: "";
     position: fixed;
@@ -20,14 +28,29 @@ body::before {
     background: repeating-linear-gradient(
             to bottom,
             rgba(255, 153, 0, 0.05),
-            rgba(255, 153, 0, 0.05) 2px,
+            rgba(255, 153, 0, 0.02) 2px,
             transparent 2px,
             transparent 4px
     );
     pointer-events: none;
-    z-index: 9999;
+    z-index: 9998;
 }
 
+/* === FLICKER OVERLAY === */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.03);
+    animation: crtFlicker 500ms infinite;
+}
+
+/* === CRT FLICKER ANIMATION === */
 @keyframes crtFlicker {
     0%, 100% {
         opacity: 1;
@@ -40,92 +63,93 @@ body::before {
     }
 }
 
+/* === CRT POWER-ON ANIMATION === */
+@keyframes powerOn {
+    0% {
+        opacity: 0;
+        transform: scaleY(0.02) scaleX(1.5);
+        filter: blur(10px);
+    }
+    60% {
+        opacity: 1;
+        transform: scaleY(1.1) scaleX(1);
+        filter: blur(2px);
+    }
+    100% {
+        transform: scaleY(1) scaleX(1);
+        filter: blur(0);
+    }
+}
 
+/* === MAIN BODY === */
 body {
-    animation: crtFlicker 100ms infinite;
-    background: rgba(0, 0, 0, 0.03);
-    height: 100%;
-    margin: 0;
-    font-family: 'Courier New', Courier, monospace;
     background-color: #000;
-    color: #ff9900;
-    text-shadow: 0 0 5px #ff9900;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px;
+    animation: powerOn 3s ease-out;
+    text-shadow: 0 0 1px #ff9900,
+    0 0 2px #ff9900,
+    0 0 3px #ff9900;
+    overflow: hidden;
 }
 
-/* === Chat Container === */
+/* === CHAT CONTAINER with CURVATURE === */
 .chat-container {
-    transform: scaleX(1.002) skewX(-0.1deg);
-    max-width: 800px;
     width: 95vh;
+    max-width: 1000px;
     height: 95vh;
-    max-height: 2200px;
     padding: 20px;
-    /*border-radius: 12px;*/
     background-color: #000;
-    /*box-shadow: 0 0 20px rgba(255, 153, 0, 0.4), 0 0 40px rgba(255, 153, 0, 0.2);*/
-
     display: flex;
     flex-direction: column;
+    transform: perspective(800px) rotateX(0.5deg) rotateY(0.5deg);
+    overflow: hidden;
 
-    /*border: 1px solid #ff9900;*/
 }
 
-/* === Headings === */
+/* === HEADINGS === */
 h2 {
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 15px;
+    margin: 0 0 15px;
     color: #ffcc66;
-    flex-shrink: 0;
-    text-shadow: 0 0 5px #ff9900;
 }
 
-/* === Endpoint Selector === */
+/* === ENDPOINT SELECTOR === */
 .endpoint-select {
-    flex-shrink: 0;
-    margin-bottom: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    margin-bottom: 15px;
 }
 
 .endpoint-select label {
     color: #ffcc99;
-    font-size: 0.9em;
+    white-space: nowrap;
 }
 
 .endpoint-select select {
-    padding: 6px 10px;
-    border-radius: 6px;
+    background: #000;
     border: 1px solid #ff9900;
-    background-color: #111;
     color: #ff9900;
-    font-size: 0.9em;
-    min-width: 180px;
-    cursor: pointer;
+    padding: 6px 10px;
 }
 
-/* === Chat Box === */
+/* === CHAT BOX === */
 .chat-box {
     flex-grow: 1;
-    min-height: 0;
     overflow-y: auto;
+    background-color: #000;
     border: 1px solid #ff9900;
     padding: 12px;
     margin-bottom: 15px;
-    background-color: #000;
-    border-radius: 8px;
 }
 
-/* === Messages === */
+/* === MESSAGES === */
 .message {
     margin-bottom: 12px;
-    line-height: 1.5;
 }
 
 .message p {
@@ -134,61 +158,162 @@ h2 {
 
 .message strong {
     color: #ffaa33;
-    margin-right: 5px;
 }
 
-/* === Markdown-like Styling === */
 .message pre {
     background-color: #111;
     padding: 8px;
-    border-radius: 4px;
     overflow-x: auto;
-    font-size: 0.9em;
-    margin-top: 5px;
     color: #ff9900;
     border: 1px solid #ff9900;
+    font-size: 0.9em;
 }
 
-.message code {
-    font-family: 'Courier New', Courier, monospace;
-}
-
-/* === Input Area === */
+/* === INPUT === */
 .input-area {
     display: flex;
     gap: 10px;
-    flex-shrink: 0;
 }
 
 input {
     flex: 1;
-    padding: 12px;
-    border-radius: 6px;
+    background: #000;
     border: 1px solid #ff9900;
-    background-color: #111;
     color: #ff9900;
-    font-size: 1em;
+    padding: 12px;
+    text-shadow: 0 0 1px #ff9900,
+    0 0 2px #ff9900,
+    0 0 4px #ff9900;
 }
 
 input::placeholder {
     color: #ffcc99;
 }
 
-/* === Button === */
+/* === BUTTON === */
 button {
     padding: 10px 18px;
-    border: none;
-    background-color: #ff9900;
+    background: #ff9900;
     color: #000;
-    border-radius: 6px;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.2s;
-    font-size: 1em;
-    text-transform: uppercase;
     font-weight: bold;
+    text-transform: uppercase;
 }
 
 button:hover {
     background-color: #ffcc66;
     color: #000;
 }
+
+
+/* === BOOT SCREEN === */
+#boot-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    color: #ff9900;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    text-align: center;
+    font-size: 1.2rem;
+    animation: bootIn 3s ease-out forwards;
+}
+
+@keyframes bootIn {
+    0% {
+        opacity: 0;
+        transform: scaleY(0.02);
+        filter: blur(10px);
+    }
+    60% {
+        opacity: 1;
+        transform: scaleY(1.1);
+        filter: blur(2px);
+    }
+    100% {
+        transform: scaleY(1);
+        filter: blur(0);
+    }
+}
+
+/* === TEXT CURSOR === */
+.cursor-blink::after {
+    content: "_";
+    animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* === Custom Scrollbar Styling === */
+
+/* Works in Chrome, Edge, Safari */
+.chat-box::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: #111;
+    border-left: 1px solid #ff9900;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background-color: #ff9900;
+    border: 2px solid #111;
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+    background-color: #ffaa33;
+}
+
+/* Firefox */
+.chat-box {
+    scrollbar-width: thin;
+    scrollbar-color: #ff9900 #111;
+}
+
+/* === Submit Button Styling === */
+button {
+    padding: 12px 20px;
+    border: 2px solid #ff9900;
+    background-color: #000;
+    color: #ffcc99;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 1px #ff9900, 0 0 2px #ffaa33;
+}
+
+button:hover {
+    background-color: #ff9900;
+    color: #000;
+    box-shadow: 0 0 1px #ff9900, 0 0 2px #ffaa33;
+}
+
+button:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 1px #ff9900, 0 0 2px #ffaa33;
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 1px #ff9900, 0 0 2px #ffaa33;
+}
+

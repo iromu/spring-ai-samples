@@ -1,7 +1,9 @@
 <template>
-  <div class="chat-container">
-    <h2>Mini ChatGPT</h2>
+  <div id="boot-screen">
+    <div class="cursor-blink">Please wait</div>
+  </div>
 
+  <div class="chat-container">
     <div class="endpoint-select">
       <label for="endpoint">Select Endpoint:</label>
       <select v-model="selectedEndpoint" id="endpoint">
@@ -11,7 +13,7 @@
       </select>
     </div>
 
-    <div class="chat-box">
+    <div class="chat-box cursor-blink">
       <div v-for="(msg, idx) in messages" :key="idx" class="message">
         <p><strong>{{ msg.sender }}:</strong> <span v-html="msg.text"/></p>
       </div>
@@ -27,6 +29,15 @@
 
 <script setup>
 import useChat from './chat.js'
+
+window.addEventListener('DOMContentLoaded', () => {
+  const bootScreen = document.getElementById('boot-screen');
+
+  // Remove boot screen after animation
+  setTimeout(() => {
+    bootScreen.style.display = 'none';
+  }, 3000);
+});
 
 const {
   userInput,
