@@ -317,3 +317,16 @@ button:focus {
     box-shadow: 0 0 1px #ff9900, 0 0 2px #ffaa33;
 }
 
+.message pre {
+    background-color: #111;
+    color: #ff9900;
+    border: 1px solid #ff9900;
+    padding: 8px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.message code {
+    font-family: 'VT323', monospace;
+    font-size: 1em;
+}

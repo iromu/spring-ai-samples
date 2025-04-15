@@ -1,5 +1,6 @@
 import {ref} from 'vue'
 import axios from 'axios'
+import {marked} from 'marked'
 
 export default function useChat() {
     const userInput = ref('')
@@ -59,12 +60,19 @@ export default function useChat() {
                             // Remove all occurrences of "data:" and replace newlines with <br>
                             let cleanedValue = value
                                 .replace(/data:/g, '')  // Remove all "data:" occurrences
-
+                                //.replace(/[ \t]+\n/g, '\n')     // Trim trailing spaces before newlines
+                                // .replace(/\n{3,}/g, '\n\n')     // Collapse 3+ newlines into just 2
+                                .replace(/^\n/, '')            // Remove leading newlines
+                                .replace(/\n\n$/, '')            // Remove trailing newlines
                             // Update rawMessage (this is just appending new data)
                             rawMessage.value += cleanedValue
 
+                            console.log(rawMessage.value)
                             // Update formattedMessage with markdown rendering
-                            aiMessage.text = formatMarkdown(rawMessage.value)
+                            aiMessage.text = marked(rawMessage.value
+                                //.replace(/\n/g, '')
+                            )
+                            console.log(aiMessage.text)
 
                             // Force reactivity update (this triggers Vue's reactivity system)
                             messages.value = [...messages.value]
