@@ -4,7 +4,7 @@
     font-family: 'VT323', 'Courier New', Courier, monospace !important;
     font-size: x-large;
     color: #ff9900; /* Optional: Set the text color to a CRT-style yellow */
-    text-shadow: 0 0 5px #ff9900; /* Optional: Add a CRT-like glow effect */
+    text-shadow: 0 0 1px #ff0000, 0 0 2px #ffcc99, 0 0 5px #0000ff;
 }
 
 html, body {
@@ -89,9 +89,6 @@ body {
     align-items: center;
     padding: 10px;
     animation: powerOn 3s ease-out;
-    text-shadow: 0 0 1px #ff9900,
-    0 0 2px #ff9900,
-    0 0 3px #ff9900;
     overflow: hidden;
 }
 
@@ -181,9 +178,6 @@ input {
     border: 1px solid #ff9900;
     color: #ff9900;
     padding: 12px;
-    text-shadow: 0 0 1px #ff9900,
-    0 0 2px #ff9900,
-    0 0 4px #ff9900;
 }
 
 input::placeholder {

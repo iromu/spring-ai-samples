@@ -62,18 +62,15 @@ export default function useChat() {
                                 .replace(/data:/g, '')  // Remove all "data:" occurrences
                                 //.replace(/[ \t]+\n/g, '\n')     // Trim trailing spaces before newlines
                                 // .replace(/\n{3,}/g, '\n\n')     // Collapse 3+ newlines into just 2
-                                .replace(/^\n/, '')            // Remove leading newlines
+                                //  .replace(/^\n/, '')            // Remove leading newlines
                                 .replace(/\n\n$/, '')            // Remove trailing newlines
+                            // .replace(/\n/, '/n')
                             // Update rawMessage (this is just appending new data)
                             rawMessage.value += cleanedValue
 
-                            console.log(rawMessage.value)
+                            // console.log(rawMessage.value)
                             // Update formattedMessage with markdown rendering
-                            aiMessage.text = marked(rawMessage.value
-                                //.replace(/\n/g, '')
-                            )
-                            console.log(aiMessage.text)
-
+                            aiMessage.text = marked(rawMessage.value)
                             // Force reactivity update (this triggers Vue's reactivity system)
                             messages.value = [...messages.value]
                         }

@@ -31,7 +31,7 @@ class ChatController {
         log.info("User: {}", userMessage);
         Prompt prompt = new Prompt(new UserMessage(userMessage));
         return chatModel.stream(prompt).map(chat -> {
-            log.info("{}", chat.getResult().getOutput().getText());
+            // log.info("{}", chat.getResult().getOutput().getText());
             return chat.getResult().getOutput().getText();
         });
     }

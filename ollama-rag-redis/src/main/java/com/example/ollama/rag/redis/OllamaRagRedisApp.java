@@ -135,7 +135,8 @@ class Chatbot {
             log.info("The User prompt has {} chars", userMessage.getText().length());
             var prompt = new Prompt(List.of(systemMessage, userMessage));
             return chatModel.stream(prompt)
-                    .doOnNext(chatResponse -> log.info("{}", chatResponse.getResult().getOutput().getText()));
+                    // .doOnNext(chatResponse -> log.info("{}", chatResponse.getResult().getOutput().getText()))
+                    ;
         });
     }
 }
