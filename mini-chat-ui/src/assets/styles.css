@@ -1,112 +1,143 @@
-/* General body and background */
+/* === Global Reset & Box Model Fix === */
 html {
-    height: 100%; /* Ensure HTML takes full height */
-    box-sizing: border-box; /* Apply box-sizing globally */
+    height: 100%;
+    box-sizing: border-box;
 }
 
 *, *:before, *:after {
-    box-sizing: inherit; /* Inherit box-sizing */
+    box-sizing: inherit;
+}
+
+/* === CRT Phosphor Theme Base === */
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+            to bottom,
+            rgba(255, 153, 0, 0.05),
+            rgba(255, 153, 0, 0.05) 2px,
+            transparent 2px,
+            transparent 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes crtFlicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.98;
+    }
+    75% {
+        opacity: 0.99;
+    }
 }
 
 
 body {
-    height: 100%; /* Make body take full height of HTML */
-    margin: 0; /* Remove default margin */
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #121212;
-    color: #e0e0e0;
-
-    /* --- Flexbox for centering the chat container --- */
+    animation: crtFlicker 100ms infinite;
+    background: rgba(0, 0, 0, 0.03);
+    height: 100%;
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #000;
+    color: #ff9900;
+    text-shadow: 0 0 5px #ff9900;
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    padding: 10px; /* Optional: Add slight padding around the container */
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
 }
 
-/* Chat container and card */
+/* === Chat Container === */
 .chat-container {
+    transform: scaleX(1.002) skewX(-0.1deg);
     max-width: 800px;
-    width: 95vh; /* Try to take full width up to max-width */
-    margin: 0; /* Centering handled by body flex */
-    height: 95vh; /* Make container take most of the viewport height (e.g., 95%) */
-    /* Or use height: 100%; if body padding isn't used and you want it flush */
-    max-height: 2200px; /* Optional: Add a max-height */
-    padding: 20px; /* Adjusted padding slightly */
-    border-radius: 12px;
-    background-color: #1e1e1e;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    width: 95vh;
+    height: 95vh;
+    max-height: 2200px;
+    padding: 20px;
+    /*border-radius: 12px;*/
+    background-color: #000;
+    /*box-shadow: 0 0 20px rgba(255, 153, 0, 0.4), 0 0 40px rgba(255, 153, 0, 0.2);*/
 
-    /* --- Flexbox for arranging items inside the container --- */
     display: flex;
-    flex-direction: column; /* Stack children vertically */
+    flex-direction: column;
+
+    /*border: 1px solid #ff9900;*/
 }
 
-/* Heading */
+/* === Headings === */
 h2 {
     text-align: center;
     margin-top: 0;
-    margin-bottom: 15px; /* Space below heading */
-    color: #90caf9;
-    flex-shrink: 0; /* Prevent heading from shrinking */
+    margin-bottom: 15px;
+    color: #ffcc66;
+    flex-shrink: 0;
+    text-shadow: 0 0 5px #ff9900;
 }
 
-/* --- Styling for the Endpoint Selector --- */
+/* === Endpoint Selector === */
 .endpoint-select {
-    flex-shrink: 0; /* Prevent this section from shrinking */
-    margin-bottom: 15px; /* Space below the dropdown */
+    flex-shrink: 0;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center label and select */
-    gap: 10px; /* Space between label and select */
+    justify-content: center;
+    gap: 10px;
 }
 
 .endpoint-select label {
-    color: #bbbbbb;
+    color: #ffcc99;
     font-size: 0.9em;
 }
 
 .endpoint-select select {
     padding: 6px 10px;
     border-radius: 6px;
-    border: 1px solid #555;
-    background-color: #2c2c2c;
-    color: #fff;
+    border: 1px solid #ff9900;
+    background-color: #111;
+    color: #ff9900;
     font-size: 0.9em;
-    min-width: 180px; /* Give it some width */
+    min-width: 180px;
     cursor: pointer;
 }
 
-/* --- End Endpoint Selector Styling --- */
-
-
-/* Chatbox container */
+/* === Chat Box === */
 .chat-box {
-    flex-grow: 1; /* Allow chat box to grow and fill available space */
-    min-height: 0; /* Important for flex-grow in column layout */
-    overflow-y: auto; /* Keep scrollbar for overflow */
-    border: 1px solid #333;
-    padding: 12px; /* Slightly more padding */
-    margin-bottom: 15px; /* Space above input area */
-    background-color: #2a2a2a;
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid #ff9900;
+    padding: 12px;
+    margin-bottom: 15px;
+    background-color: #000;
     border-radius: 8px;
 }
 
-/* Individual messages */
+/* === Messages === */
 .message {
     margin-bottom: 12px;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .message p {
-    margin: 0; /* Remove default paragraph margin inside message */
+    margin: 0;
 }
 
 .message strong {
-    color: #90caf9; /* Make sender standout slightly */
+    color: #ffaa33;
     margin-right: 5px;
 }
 
-/* Handle code blocks if v-html might contain them */
+/* === Markdown-like Styling === */
 .message pre {
     background-color: #111;
     padding: 8px;
@@ -114,46 +145,50 @@ h2 {
     overflow-x: auto;
     font-size: 0.9em;
     margin-top: 5px;
+    color: #ff9900;
+    border: 1px solid #ff9900;
 }
 
 .message code {
     font-family: 'Courier New', Courier, monospace;
 }
 
-
-/* Input section (textarea and button) */
+/* === Input Area === */
 .input-area {
     display: flex;
     gap: 10px;
-    flex-shrink: 0; /* Prevent input area from shrinking */
+    flex-shrink: 0;
 }
 
-input { /* Input element styling */
-    flex: 1; /* Allow input to grow horizontally */
-    padding: 12px; /* More padding */
+input {
+    flex: 1;
+    padding: 12px;
     border-radius: 6px;
-    border: 1px solid #555;
-    background-color: #2c2c2c;
-    color: #fff;
-    font-size: 1em; /* Ensure readable font size */
+    border: 1px solid #ff9900;
+    background-color: #111;
+    color: #ff9900;
+    font-size: 1em;
 }
 
 input::placeholder {
-    color: #aaa;
+    color: #ffcc99;
 }
 
-/* Button */
+/* === Button === */
 button {
-    padding: 10px 18px; /* Adjusted padding */
+    padding: 10px 18px;
     border: none;
-    background-color: #2196f3;
-    color: #fff;
+    background-color: #ff9900;
+    color: #000;
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s;
-    font-size: 1em; /* Match input */
+    font-size: 1em;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 button:hover {
-    background-color: #1976d2;
+    background-color: #ffcc66;
+    color: #000;
 }
