@@ -2,7 +2,6 @@
   <div class="chat-container">
     <h2>Mini ChatGPT</h2>
 
-    <!-- Dropdown to select API endpoint -->
     <div class="endpoint-select">
       <label for="endpoint">Select Endpoint:</label>
       <select v-model="selectedEndpoint" id="endpoint">
@@ -14,17 +13,12 @@
 
     <div class="chat-box">
       <div v-for="(msg, idx) in messages" :key="idx" class="message">
-        <p><strong>{{ msg.sender }}:</strong></p>
-        <p v-html="msg.text"></p> <!-- Render HTML here -->
+        <p><strong>{{ msg.sender }}:</strong> <span v-html="msg.text"/></p>
       </div>
     </div>
 
     <div class="input-area">
-      <input
-          v-model="userInput"
-          @keyup.enter="sendMessage"
-          placeholder="Type your message..."
-      />
+      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..."/>
       <button @click="sendMessage">Send</button>
     </div>
   </div>

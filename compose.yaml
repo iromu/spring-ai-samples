@@ -7,7 +7,7 @@ services:
 
   mini-chat-ui:
     container_name: mini-chat-ui
-    image: iromu/mini-chat-ui
+    image: iromu/mini-chat-ui:latest
     build:
       context: ./mini-chat-ui
     #      args:

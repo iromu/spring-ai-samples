@@ -1,57 +1,141 @@
 /* General body and background */
+html {
+    height: 100%; /* Ensure HTML takes full height */
+    box-sizing: border-box; /* Apply box-sizing globally */
+}
+
+*, *:before, *:after {
+    box-sizing: inherit; /* Inherit box-sizing */
+}
+
+
 body {
-    margin: 0;
+    height: 100%; /* Make body take full height of HTML */
+    margin: 0; /* Remove default margin */
     font-family: 'Segoe UI', sans-serif;
     background-color: #121212;
     color: #e0e0e0;
+
+    /* --- Flexbox for centering the chat container --- */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding: 10px; /* Optional: Add slight padding around the container */
 }
 
 /* Chat container and card */
 .chat-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 24px;
+    max-width: 800px;
+    width: 95vh; /* Try to take full width up to max-width */
+    margin: 0; /* Centering handled by body flex */
+    height: 95vh; /* Make container take most of the viewport height (e.g., 95%) */
+    /* Or use height: 100%; if body padding isn't used and you want it flush */
+    max-height: 2200px; /* Optional: Add a max-height */
+    padding: 20px; /* Adjusted padding slightly */
     border-radius: 12px;
     background-color: #1e1e1e;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+
+    /* --- Flexbox for arranging items inside the container --- */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
 }
 
 /* Heading */
 h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-top: 0;
+    margin-bottom: 15px; /* Space below heading */
     color: #90caf9;
+    flex-shrink: 0; /* Prevent heading from shrinking */
 }
+
+/* --- Styling for the Endpoint Selector --- */
+.endpoint-select {
+    flex-shrink: 0; /* Prevent this section from shrinking */
+    margin-bottom: 15px; /* Space below the dropdown */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center label and select */
+    gap: 10px; /* Space between label and select */
+}
+
+.endpoint-select label {
+    color: #bbbbbb;
+    font-size: 0.9em;
+}
+
+.endpoint-select select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #2c2c2c;
+    color: #fff;
+    font-size: 0.9em;
+    min-width: 180px; /* Give it some width */
+    cursor: pointer;
+}
+
+/* --- End Endpoint Selector Styling --- */
+
 
 /* Chatbox container */
 .chat-box {
-    height: 300px;
-    overflow-y: auto;
+    flex-grow: 1; /* Allow chat box to grow and fill available space */
+    min-height: 0; /* Important for flex-grow in column layout */
+    overflow-y: auto; /* Keep scrollbar for overflow */
     border: 1px solid #333;
-    padding: 10px;
-    margin-bottom: 15px;
+    padding: 12px; /* Slightly more padding */
+    margin-bottom: 15px; /* Space above input area */
     background-color: #2a2a2a;
     border-radius: 8px;
 }
 
 /* Individual messages */
 .message {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    line-height: 1.4;
 }
+
+.message p {
+    margin: 0; /* Remove default paragraph margin inside message */
+}
+
+.message strong {
+    color: #90caf9; /* Make sender standout slightly */
+    margin-right: 5px;
+}
+
+/* Handle code blocks if v-html might contain them */
+.message pre {
+    background-color: #111;
+    padding: 8px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.message code {
+    font-family: 'Courier New', Courier, monospace;
+}
+
 
 /* Input section (textarea and button) */
 .input-area {
     display: flex;
     gap: 10px;
+    flex-shrink: 0; /* Prevent input area from shrinking */
 }
 
-input {
-    flex: 1;
-    padding: 10px;
+input { /* Input element styling */
+    flex: 1; /* Allow input to grow horizontally */
+    padding: 12px; /* More padding */
     border-radius: 6px;
     border: 1px solid #555;
     background-color: #2c2c2c;
     color: #fff;
+    font-size: 1em; /* Ensure readable font size */
 }
 
 input::placeholder {
@@ -60,13 +144,14 @@ input::placeholder {
 
 /* Button */
 button {
-    padding: 10px 16px;
+    padding: 10px 18px; /* Adjusted padding */
     border: none;
     background-color: #2196f3;
     color: #fff;
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-size: 1em; /* Match input */
 }
 
 button:hover {
