@@ -1,104 +1,93 @@
-import {ref} from 'vue'
+import {ref, watch} from 'vue'
 import axios from 'axios'
 import {marked} from 'marked'
 
 export default function useChat() {
     const userInput = ref('')
-    const messages = ref([])
 
-    // The dropdown options for selecting the endpoint
     const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
+    const selectedEndpoint = ref(endpoints[0]?.value || '')
 
-    // Default selected endpoint
-    const selectedEndpoint = ref(endpoints[0].value)
+    // Object to store message history per endpoint
+    const histories = ref(
+        Object.fromEntries(endpoints.map(e => [e.value, []]))
+    )
 
-    // Raw message data (unformatted)
+    const messages = ref(histories.value[selectedEndpoint.value]) // active view
+
     const rawMessage = ref('')
-    // Formatted message data (markdown converted to HTML)
     const formattedMessage = ref('')
-    const id = crypto.randomUUID();
+    const id = crypto.randomUUID()
+
+    // Watch for endpoint changes and update visible messages
+    watch(selectedEndpoint, (newVal) => {
+        messages.value = histories.value[newVal]
+    })
+
     const sendMessage = async () => {
-        if (!userInput.value.trim()) return
+        const message = userInput.value.trim()
+        if (!message) return
 
-        // Show the user message
-        messages.value.push({sender: 'You', text: userInput.value})
+        const currentHistory = histories.value[selectedEndpoint.value]
 
-        scrollToBottom()
-        // Create an object to hold the AI message text while it's being streamed
+        currentHistory.push({sender: 'You', text: message})
         const aiMessage = {sender: 'AI', text: ''}
-        messages.value.push(aiMessage)
+        currentHistory.push(aiMessage)
 
-
-        // Reset raw message and formatted message
         rawMessage.value = ''
         formattedMessage.value = ''
 
+        scrollToBottom()
+
         try {
-            scrollToBottom()
-            axios
-                .post(
-                    selectedEndpoint.value, {
-                        id: id,
-                        message: userInput.value,
-                    },
-                    {
-                        headers: {
-                            Accept: 'text/event-stream',
-                        },
-                        responseType: 'stream',
-                        adapter: 'fetch',
-                    }
-                )
-                .then(async (response) => {
-                    console.log('axios got a response')
-                    const stream = response.data
-                    // Consume response
-                    const reader = stream.pipeThrough(new TextDecoderStream()).getReader()
+            const response = await axios.post(
+                selectedEndpoint.value,
+                {
+                    id,
+                    message
+                },
+                {
+                    headers: {Accept: 'text/event-stream'},
+                    responseType: 'stream',
+                    adapter: 'fetch'
+                }
+            )
 
-                    let done = false
-                    while (!done) {
-                        const {value, done: readerDone} = await reader.read()
-                        done = readerDone
+            const reader = response.data
+                .pipeThrough(new TextDecoderStream())
+                .getReader()
 
-                        if (value) {
-                            // Remove all occurrences of "data:" and replace newlines with <br>
-                            let cleanedValue = value
-                                .replace(/data:/g, '')  // Remove all "data:" occurrences
-                                //.replace(/[ \t]+\n/g, '\n')     // Trim trailing spaces before newlines
-                                // .replace(/\n{3,}/g, '\n\n')     // Collapse 3+ newlines into just 2
-                                //  .replace(/^\n/, '')            // Remove leading newlines
-                                .replace(/\n\n$/, '')            // Remove trailing newlines
-                            // .replace(/\n/, '/n')
-                            // Update rawMessage (this is just appending new data)
-                            rawMessage.value += cleanedValue
+            let done = false
+            while (!done) {
+                const {value, done: readerDone} = await reader.read()
+                done = readerDone
 
-                            // console.log(rawMessage.value)
-                            // Update formattedMessage with markdown rendering
-                            aiMessage.text = marked(rawMessage.value)
-                            // Force reactivity update (this triggers Vue's reactivity system)
-                            messages.value = [...messages.value]
-                        }
+                if (value) {
+                    let cleanedValue = value
+                        .replace(/data:/g, '')
+                        .replace(/\n\n$/, '') // remove trailing double newline
 
-                        // Scroll to the bottom after each update
-                        scrollToBottom()
-                    }
-                })
-                .catch((e) => {
-                    console.error('Axios error:', e)
-                })
+                    rawMessage.value += cleanedValue
+                    aiMessage.text = marked(rawMessage.value)
+                    histories.value[selectedEndpoint.value] = [...currentHistory]
+                    messages.value = histories.value[selectedEndpoint.value]
+                }
+
+                scrollToBottom()
+            }
         } catch (err) {
-            console.error('Error sending message:', err)
-            scrollToBottom()
+            console.error('Error streaming response:', err)
+            aiMessage.text = '[Error]'
         }
 
-        // Clear input field after sending the message
         userInput.value = ''
     }
 
-    // Function to scroll the chat to the bottom after each new message
     const scrollToBottom = () => {
         const chatBox = document.querySelector('.chat-box')
-        chatBox.scrollTop = chatBox.scrollHeight
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight
+        }
     }
 
     return {
@@ -107,6 +96,6 @@ export default function useChat() {
         endpoints,
         selectedEndpoint,
         sendMessage,
-        formattedMessage,  // Now use formattedMessage for rendering
+        formattedMessage
     }
 }
