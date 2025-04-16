@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,9 +15,11 @@ import reactor.core.publisher.Mono;
 class ChatController {
 
     private final ChatModel chatModel;
+    private final String model;
 
-    public ChatController(ChatModel chatModel) {
+    public ChatController(ChatModel chatModel, @Value("${spring.ai.ollama.chat.options.model}") String model) {
         this.chatModel = chatModel;
+        this.model = model;
     }
 
     @GetMapping("api/request")
@@ -26,7 +29,7 @@ class ChatController {
 
     @GetMapping("api/chat/info")
     Mono<String> generate() {
-        return Mono.just("Simple chat");
+        return Mono.just("Simple chat. Using " + model);
     }
 
     @RequestMapping(value = "api/chat", method = {RequestMethod.GET, RequestMethod.POST})

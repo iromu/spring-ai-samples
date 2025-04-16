@@ -1,5 +1,6 @@
 package com.example.ollama.rag.redis;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -9,14 +10,16 @@ import reactor.core.publisher.Mono;
 class ChatController {
 
     private final Chatbot chatbot;
+    private final String model;
 
-    public ChatController(Chatbot chatbot) {
+    public ChatController(Chatbot chatbot, @Value("${spring.ai.ollama.chat.options.model}") String model) {
         this.chatbot = chatbot;
+        this.model = model;
     }
 
     @GetMapping("api/chat/info")
     Mono<String> generate() {
-        return Mono.just("Advanced RAG with history support and tweaks");
+        return Mono.just("Advanced RAG with history support and tweaks. Using " + model);
     }
 
     @RequestMapping(value = "api/chat", method = {RequestMethod.POST})
