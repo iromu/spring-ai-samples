@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import redis.clients.jedis.params.ScanParams;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,11 @@ public class OllamaRagRedisApp {
             var textSplitter = new TokenTextSplitter();
             var documentList = textSplitter.apply(documentReader.get());
             log.info("Adding {} documents to the vector store", documentList.size());
-            vectorStore.accept(documentList);
+            for (Document document : documentList) {
+                log.info("Adding document {}", document.getId());
+                vectorStore.accept(Collections.singletonList(document));
+            }
+            log.info("Added {} documents to the vector store", documentList.size());
         };
     }
 
