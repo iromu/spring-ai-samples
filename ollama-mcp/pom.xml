@@ -10,6 +10,13 @@
     </parent>
 
     <artifactId>ollama-mcp</artifactId>
+    <packaging>pom</packaging>
 
-
+    <modules>
+        <!--        <module>openapi-mcp</module>-->
+        <!--        <module>booking-openapi</module>-->
+        <!--        <module>product-openapi</module>-->
+        <module>mcp-trino-chat</module>
+        <module>mcp-server-trino</module>
+    </modules>
 </project>
