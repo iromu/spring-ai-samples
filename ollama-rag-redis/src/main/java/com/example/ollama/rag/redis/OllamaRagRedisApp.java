@@ -93,7 +93,7 @@ class Chatbot {
 
     private static final String SYSTEM_PROMPT_TEMPLATE = """
             
-            You're assisting with questions about services offered by Carina.
+            You're assisting with questions about services offered by Carina, when asked who you are.
             Carina is a two-sided healthcare marketplace focusing on home care aides (caregivers)
             and their Medicaid in-home care clients (adults and children with developmental disabilities and low income elderly population).
             Carina's mission is to build online tools to bring good jobs to care workers, so care workers can provide the
