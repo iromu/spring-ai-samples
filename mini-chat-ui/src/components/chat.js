@@ -4,6 +4,7 @@ import {marked} from 'marked'
 
 export default function useChat() {
     const tokensPerSecond = ref(0)
+    const totalDuration = ref(0) // in seconds
 
     const userInput = ref('')
 
@@ -119,6 +120,7 @@ export default function useChat() {
 
                     const tokens = cleanedValue.trim().split(/\s+/).length
                     tokenCount += tokens
+                    totalDuration.value = ((performance.now() - startTime) / 1000).toFixed(2)
 
                     const elapsed = (performance.now() - startTime) / 1000 // seconds
                     if (elapsed > 0) {
@@ -134,6 +136,7 @@ export default function useChat() {
                 scrollToBottom()
             }
             //tokensPerSecond.value = 0
+            totalDuration.value = ((performance.now() - startTime) / 1000).toFixed(2)
 
         } catch (err) {
             if (err.name === 'AbortError') {
@@ -163,6 +166,9 @@ export default function useChat() {
         endpoints,
         selectedEndpoint,
         sendMessage,
-        formattedMessage, loading, tokensPerSecond
+        formattedMessage,
+        loading,
+        tokensPerSecond,
+        totalDuration
     }
 }
