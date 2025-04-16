@@ -19,11 +19,45 @@ export default function useChat() {
     const rawMessage = ref('')
     const formattedMessage = ref('')
     const id = crypto.randomUUID()
+    const fetchedInfoEndpoints = new Set()
 
-    // Watch for endpoint changes and update visible messages
+    const fetchEndpointInfo = async (endpoint) => {
+        if (!fetchedInfoEndpoints.has(endpoint)) {
+            try {
+                const res = await axios.get(`${endpoint}/info`)
+                const infoText = typeof res.data === 'string'
+                    ? res.data
+                    : JSON.stringify(res.data, null, 2)
+
+                histories.value[endpoint].push({
+                    sender: 'System',
+                    text: marked(infoText)
+                })
+
+                if (endpoint === selectedEndpoint.value) {
+                    messages.value = [...histories.value[endpoint]]
+                }
+
+                fetchedInfoEndpoints.add(endpoint)
+            } catch (err) {
+                console.error('Error fetching /info:', err)
+                histories.value[endpoint].push({
+                    sender: 'System',
+                    text: '[Failed to load endpoint info]'
+                })
+            }
+        }
+    }
+
+    // Watch for endpoint changes
     watch(selectedEndpoint, (newVal) => {
         messages.value = histories.value[newVal]
+        fetchEndpointInfo(newVal)
     })
+
+    // 🔥 Trigger initial fetch for default endpoint
+    fetchEndpointInfo(selectedEndpoint.value)
+
 
     const sendMessage = async () => {
         // If already loading, cancel

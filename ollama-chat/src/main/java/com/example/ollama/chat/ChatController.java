@@ -24,6 +24,11 @@ class ChatController {
         return Mono.fromCallable(() -> chatModel.call(message));
     }
 
+    @GetMapping("api/chat/info")
+    Mono<String> generate() {
+        return Mono.just("Simple chat");
+    }
+
     @RequestMapping(value = "api/chat", method = {RequestMethod.GET, RequestMethod.POST})
     Flux<String> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message,
                                 @RequestBody(required = false) Input messageBody) {

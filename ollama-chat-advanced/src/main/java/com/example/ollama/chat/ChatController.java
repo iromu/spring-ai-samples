@@ -3,6 +3,7 @@ package com.example.ollama.chat;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -14,6 +15,11 @@ class ChatController {
 
     ChatController(Chatbot chatbot) {
         this.chatbot = chatbot;
+    }
+
+    @GetMapping("api/chat/info")
+    Mono<String> generate() {
+        return Mono.just("Advanced chat with history");
     }
 
     @RequestMapping(value = "api/chat", method = {RequestMethod.POST})

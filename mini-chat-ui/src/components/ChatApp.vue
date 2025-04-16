@@ -14,8 +14,9 @@
     </div>
 
     <div class="chat-box cursor-blink">
-      <div v-for="(msg, idx) in messages" :key="idx" class="message">
-        <p><strong>{{ msg.sender }}:</strong> <span v-html="msg.text"/></p>
+      <div v-for="msg in messages" :key="msg" class="message" :class="{ system: msg.sender === 'System' }">
+        <strong v-if="msg.sender !== 'System'">{{ msg.sender }}:</strong>
+        <div v-html="msg.text"></div>
       </div>
     </div>
 

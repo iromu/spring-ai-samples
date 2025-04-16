@@ -354,3 +354,8 @@ button:focus {
     font-family: 'VT323', monospace;
     font-size: 1em;
 }
+
+.message.system {
+    color: #cccccc;
+    font-style: italic;
+}

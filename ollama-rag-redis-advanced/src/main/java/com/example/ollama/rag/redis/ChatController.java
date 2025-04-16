@@ -2,6 +2,7 @@ package com.example.ollama.rag.redis;
 
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @CrossOrigin(origins = "*") // Allow frontend access
@@ -11,6 +12,11 @@ class ChatController {
 
     public ChatController(Chatbot chatbot) {
         this.chatbot = chatbot;
+    }
+
+    @GetMapping("api/chat/info")
+    Mono<String> generate() {
+        return Mono.just("Advanced RAG with history support and tweaks");
     }
 
     @RequestMapping(value = "api/chat", method = {RequestMethod.POST})
