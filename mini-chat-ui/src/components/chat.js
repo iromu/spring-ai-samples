@@ -7,6 +7,7 @@ export default function useChat() {
 
     const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
     const selectedEndpoint = ref(endpoints[0]?.value || '')
+    const loading = ref(false)
 
     // Object to store message history per endpoint
     const histories = ref(
@@ -28,6 +29,8 @@ export default function useChat() {
         const message = userInput.value.trim()
         if (!message) return
 
+        userInput.value = ' '
+        loading.value = true
         const currentHistory = histories.value[selectedEndpoint.value]
 
         currentHistory.push({sender: 'You', text: message})
@@ -78,6 +81,8 @@ export default function useChat() {
         } catch (err) {
             console.error('Error streaming response:', err)
             aiMessage.text = '[Error]'
+        } finally {
+            loading.value = false
         }
 
         userInput.value = ''
@@ -96,6 +101,6 @@ export default function useChat() {
         endpoints,
         selectedEndpoint,
         sendMessage,
-        formattedMessage
+        formattedMessage, loading
     }
 }

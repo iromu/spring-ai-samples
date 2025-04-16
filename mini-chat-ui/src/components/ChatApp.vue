@@ -6,7 +6,7 @@
   <div class="chat-container">
     <div class="endpoint-select">
       <label for="endpoint">Select Endpoint:</label>
-      <select v-model="selectedEndpoint" id="endpoint">
+      <select v-model="selectedEndpoint" id="endpoint" :disabled="loading">
         <option v-for="endpoint in endpoints" :key="endpoint.value" :value="endpoint.value">
           {{ endpoint.label }}
         </option>
@@ -20,7 +20,7 @@
     </div>
 
     <div class="input-area">
-      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..."/>
+      <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..." :disabled="loading"/>
       <button @click="sendMessage">Send</button>
     </div>
   </div>
@@ -44,7 +44,7 @@ const {
   messages,
   endpoints,
   selectedEndpoint,
-  sendMessage,
+  sendMessage, loading
 } = useChat()
 </script>
 
