@@ -8,7 +8,7 @@ export default function useChat() {
     const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
     const selectedEndpoint = ref(endpoints[0]?.value || '')
     const loading = ref(false)
-
+    let controller = null
     // Object to store message history per endpoint
     const histories = ref(
         Object.fromEntries(endpoints.map(e => [e.value, []]))
@@ -26,11 +26,18 @@ export default function useChat() {
     })
 
     const sendMessage = async () => {
+        // If already loading, cancel
+        if (loading.value && controller) {
+            controller.abort()
+            loading.value = false
+            return
+        }
         const message = userInput.value.trim()
         if (!message) return
 
         userInput.value = ' '
         loading.value = true
+        controller = new AbortController()
         const currentHistory = histories.value[selectedEndpoint.value]
 
         currentHistory.push({sender: 'You', text: message})
@@ -52,7 +59,8 @@ export default function useChat() {
                 {
                     headers: {Accept: 'text/event-stream'},
                     responseType: 'stream',
-                    adapter: 'fetch'
+                    adapter: 'fetch',
+                    signal: controller.signal
                 }
             )
 
@@ -79,10 +87,15 @@ export default function useChat() {
                 scrollToBottom()
             }
         } catch (err) {
-            console.error('Error streaming response:', err)
-            aiMessage.text = '[Error]'
+            if (err.name === 'AbortError') {
+                aiMessage.text += '[Cancelled]'
+            } else {
+                console.error('Error streaming response:', err)
+                aiMessage.text = '[Error]'
+            }
         } finally {
             loading.value = false
+            controller = null
         }
 
         userInput.value = ''

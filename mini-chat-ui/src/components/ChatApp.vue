@@ -21,7 +21,7 @@
 
     <div class="input-area">
       <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..." :disabled="loading"/>
-      <button @click="sendMessage">Send</button>
+      <button @click="sendMessage">{{ loading ? 'STOP' : 'SEND' }}</button>
     </div>
   </div>
 </template>
