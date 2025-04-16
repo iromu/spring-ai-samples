@@ -5,6 +5,14 @@ services:
     ports:
       - "9736:6379"
 
+  trino:
+    container_name: trino
+    image: trinodb/trino:latest
+    ports:
+      - "8384:8080"
+    volumes:
+      - ./docker/trino/etc:/etc/trino
+
   mini-chat-ui:
     container_name: mini-chat-ui
     image: iromu/mini-chat-ui:latest
