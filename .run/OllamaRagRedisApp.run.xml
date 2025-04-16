@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="OllamaRagRedisApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" nameIsGenerated="true">
+        <module name="ollama-rag-redis"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.ollama.rag.redis.OllamaRagRedisApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

@@ -16,25 +16,29 @@ export default function useChat() {
     const rawMessage = ref('')
     // Formatted message data (markdown converted to HTML)
     const formattedMessage = ref('')
-
+    const id = crypto.randomUUID();
     const sendMessage = async () => {
         if (!userInput.value.trim()) return
 
         // Show the user message
         messages.value.push({sender: 'You', text: userInput.value})
 
+        scrollToBottom()
         // Create an object to hold the AI message text while it's being streamed
         const aiMessage = {sender: 'AI', text: ''}
         messages.value.push(aiMessage)
+
 
         // Reset raw message and formatted message
         rawMessage.value = ''
         formattedMessage.value = ''
 
         try {
+            scrollToBottom()
             axios
                 .post(
                     selectedEndpoint.value, {
+                        id: id,
                         message: userInput.value,
                     },
                     {
@@ -95,25 +99,6 @@ export default function useChat() {
     const scrollToBottom = () => {
         const chatBox = document.querySelector('.chat-box')
         chatBox.scrollTop = chatBox.scrollHeight
-    }
-
-    // Function to convert Markdown to HTML (supporting bold, italic, code, links, etc.)
-    const formatMarkdown = (text) => {
-        // Bold: **bold** or __bold__
-        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-        text = text.replace(/__(.*?)__/g, '<strong>$1</strong>')  // __bold__
-
-        // Italic: *italic* or _italic_
-        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>')  // *italic*
-        text = text.replace(/_(.*?)_/g, '<em>$1</em>')  // _italic_
-
-        // Code: `code`
-        text = text.replace(/`(.*?)`/g, '<code>$1</code>')  // `code`
-
-        // Links: [text](http://link.com)
-        text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')  // [text](url)
-
-        return text
     }
 
     return {

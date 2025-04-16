@@ -10,6 +10,7 @@ sleep 5
 
 echo "🔴 Retrieve LLAMA3 model..."
 ollama pull llama3.1:8b
+ollama pull llama3
 
 #echo "🔴 Retrieve MISTRAL model..."
 #ollama pull mistral
