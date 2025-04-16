@@ -152,6 +152,7 @@ h2, h3 {
 
 .message p {
     margin: 0;
+    margin-bottom: 12px;
 }
 
 .message strong {
@@ -166,6 +167,33 @@ h2, h3 {
     color: #ff9900;
     border: 1px solid #ff9900;
     font-size: 0.9em;
+}
+
+.message table {
+    border: 1px solid #ff9900;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+}
+
+.message table th,
+.message table td {
+    border: 1px solid #ff9900;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.message table thead {
+    background-color: #111;
+    text-shadow: 0 0 3px #ff9900;
+}
+
+.message table th {
+    font-weight: bold;
+    color: #ffaa33;
+}
+
+.message table tbody tr:nth-child(even) {
+    background-color: #111;
 }
 
 /* === INPUT === */
