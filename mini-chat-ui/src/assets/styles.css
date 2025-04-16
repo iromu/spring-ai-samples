@@ -351,11 +351,17 @@ button:focus {
 }
 
 .message code {
-    font-family: 'VT323', monospace;
     font-size: 1em;
 }
 
 .message.system {
-    color: #cccccc;
     font-style: italic;
+    padding-bottom: 12pc;
+}
+
+.token-gauge {
+    padding-top: 10px;
+    color: #ff9900;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px #ff9900;
 }

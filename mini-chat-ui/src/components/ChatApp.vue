@@ -24,6 +24,10 @@
       <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..." :disabled="loading"/>
       <button @click="sendMessage">{{ loading ? 'STOP' : 'SEND' }}</button>
     </div>
+    <div class="token-gauge">
+      {{ tokensPerSecond }} tokens/s
+    </div>
+
   </div>
 </template>
 
@@ -45,7 +49,7 @@ const {
   messages,
   endpoints,
   selectedEndpoint,
-  sendMessage, loading
+  sendMessage, loading, tokensPerSecond
 } = useChat()
 </script>
 

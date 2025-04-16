@@ -3,6 +3,8 @@ import axios from 'axios'
 import {marked} from 'marked'
 
 export default function useChat() {
+    const tokensPerSecond = ref(0)
+
     const userInput = ref('')
 
     const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
@@ -102,6 +104,9 @@ export default function useChat() {
                 .pipeThrough(new TextDecoderStream())
                 .getReader()
 
+            let tokenCount = 0
+            let startTime = performance.now()
+
             let done = false
             while (!done) {
                 const {value, done: readerDone} = await reader.read()
@@ -112,6 +117,14 @@ export default function useChat() {
                         .replace(/data:/g, '')
                         .replace(/\n\n$/, '') // remove trailing double newline
 
+                    const tokens = cleanedValue.trim().split(/\s+/).length
+                    tokenCount += tokens
+
+                    const elapsed = (performance.now() - startTime) / 1000 // seconds
+                    if (elapsed > 0) {
+                        tokensPerSecond.value = (tokenCount / elapsed).toFixed(2)
+                    }
+
                     rawMessage.value += cleanedValue
                     aiMessage.text = marked(rawMessage.value)
                     histories.value[selectedEndpoint.value] = [...currentHistory]
@@ -120,6 +133,8 @@ export default function useChat() {
 
                 scrollToBottom()
             }
+            //tokensPerSecond.value = 0
+
         } catch (err) {
             if (err.name === 'AbortError') {
                 aiMessage.text += '[Cancelled]'
@@ -148,6 +163,6 @@ export default function useChat() {
         endpoints,
         selectedEndpoint,
         sendMessage,
-        formattedMessage, loading
+        formattedMessage, loading, tokensPerSecond
     }
 }
