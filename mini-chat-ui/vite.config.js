@@ -7,6 +7,10 @@ export default defineConfig({
         'process.env': process.env,
         host: true,
         cors: false,
-        port: 3000
+        port: 3000,
+        // allowedHosts: 'fqdn',
+        // hmr: {
+        //      host: 'fqdn',
+        //}
     }
 })

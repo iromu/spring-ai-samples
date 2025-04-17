@@ -6,21 +6,18 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.4.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>org.iromu.ai</groupId>
     <artifactId>spring-ai-samples</artifactId>
     <version>${revision}${sha1}${changelist}</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>ollama-chat</module>
-        <module>ollama-chat-advanced</module>
-        <module>ollama-rag-redis</module>
-        <module>ollama-rag-redis-advanced</module>
-        <module>ollama-mcp</module>
+        <module>mcp</module>
         <module>mini-chat-ui</module>
+        <module>rag</module>
+        <module>chat</module>
     </modules>
 
     <properties>

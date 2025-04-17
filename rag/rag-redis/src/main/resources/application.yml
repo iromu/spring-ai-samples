@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: rag-redis
+  ai:
+    vectorstore:
+      redis:
+        uri: redis://localhost:9736
+        index: rag-index
+        prefix: "rag:"
+        initialize-schema: true
+    ollama:
+      chat:
+        options:
+          model: llama3
+      embedding:
+        model: llama3
+  docker:
+    compose:
+      lifecycle-management: start_only
+
+server:
+  port: 7772

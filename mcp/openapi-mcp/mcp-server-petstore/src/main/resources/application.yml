@@ -1,0 +1,12 @@
+spring.ai.mcp.server.name: mcp-server-openapi
+spring.ai.mcp.server.version: 0.0.1
+server.port: 7002
+spring:
+  ai:
+    mcp:
+      server:
+        type: async
+
+openapi:
+  urls:
+    - "http://localhost:8334/v2/swagger.json"

@@ -13,15 +13,41 @@ services:
     volumes:
       - ./docker/trino/etc:/etc/trino
 
-  mini-chat-ui:
-    container_name: mini-chat-ui
-    image: iromu/mini-chat-ui:latest
-    build:
-      context: ./mini-chat-ui
-    #      args:
-    #        - VITE_BACKEND_URL=http://chat-backend:8080
+  petstore:
+    container_name: petstore
+    image: swaggerapi/petstore:latest
     ports:
-      - "3000:80"
+      - "8334:8080"
+    environment:
+      SWAGGER_HOST: http://localhost:8334
+      SWAGGER_URL: http://localhost:8334
+      SWAGGER_BASE_PATH: /v2
+
+
+  # mini-chat-ui:
+  #    container_name: mini-chat-ui
+  #    image: iromu/mini-chat-ui:latest
+  #    build:
+  #      context: ./mini-chat-ui
+  #    #      args:
+  #    #        - VITE_BACKEND_URL=http://chat-backend:8080
+  #    ports:
+  #      - "3000:80"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "8000:8080"
+    environment:
+      WEBUI_AUTH: False
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  open-webui:
 
 # 1. This is SLOW
 # First time boot needs to download 'llama3' model, 4.7 GB. If docker compose is started by Spring it will fail and stop the container.

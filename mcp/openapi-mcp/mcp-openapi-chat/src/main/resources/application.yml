@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: mcp-openapi-chat
+  ai:
+    ollama:
+      chat:
+        options:
+          model: llama3.1:8b
+    mcp:
+      client:
+        type: async
+        sse:
+          connections:
+            mcp-server-petstore:
+              url: http://localhost:7002
+  docker:
+    compose:
+      lifecycle-management: start_only
+
+server:
+  port: 7775
+
+

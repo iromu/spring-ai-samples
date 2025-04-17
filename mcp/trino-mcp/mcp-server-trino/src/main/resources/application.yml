@@ -1,0 +1,12 @@
+spring.ai.mcp.server.name: mcp-server-trino
+spring.ai.mcp.server.version: 0.0.1
+server.port: 7001
+
+spring.datasource.driver-class-name: io.trino.jdbc.TrinoDriver
+spring.datasource.url: jdbc:trino://localhost:8384
+spring.datasource.username: trino
+spring:
+  ai:
+    mcp:
+      server:
+        type: async
