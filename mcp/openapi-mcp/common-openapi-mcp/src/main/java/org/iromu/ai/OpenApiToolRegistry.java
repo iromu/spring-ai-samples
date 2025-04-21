@@ -7,6 +7,7 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Getter
+@Slf4j
 public class OpenApiToolRegistry {
 
     @Data
@@ -70,6 +72,7 @@ public class OpenApiToolRegistry {
                             operation.getOperationId(), baseUrl, path, method, operation
                     );
                     operationMap.put(operation.getOperationId(), meta);
+                    log.info("Added {} {} {} {}", baseUrl, method, path, operation.getOperationId());
                 }
             });
         });

@@ -9,4 +9,4 @@ spring:
 
 openapi:
   urls:
-    - "http://localhost:8334/v2/swagger.json"
+    - "http://localhost:8334/openapi.yaml"

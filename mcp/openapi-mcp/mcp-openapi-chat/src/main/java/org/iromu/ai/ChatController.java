@@ -13,13 +13,7 @@ class ChatController {
 
     private static final String EXAMPLE = """
             Try these prompts:
-            * Show catalogs
-            * Show schemas from tpch
-            * Show tables from tiny
-            * Show tables from catalog tpch and schema tiny
-            * Select some data from the table customer
-            * show first 10 rows from catalog tpch, schema tiny and table customer as a table
-            * show first 10 rows from catalog tpch, schema tiny and table customer as a table and filter by mktsegment equals MACHINERY
+
             """;
     private final Chatbot chatbot;
     private final String model;
@@ -31,7 +25,7 @@ class ChatController {
 
     @GetMapping("api/chat/info")
     Mono<String> generate() {
-        return Mono.just("MCP Trino Chat. Using " + model + "\n" + EXAMPLE);
+        return Mono.just("MCP OpenAPI Chat. Using " + model + "\n" + EXAMPLE);
     }
 
     @RequestMapping(value = "api/chat", method = {RequestMethod.POST})
