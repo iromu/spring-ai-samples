@@ -21,3 +21,6 @@ server:
   port: 7774
 
 
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG

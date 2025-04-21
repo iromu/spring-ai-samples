@@ -10,3 +10,9 @@ spring:
     mcp:
       server:
         type: async
+
+logging:
+  level:
+    root: DEBUG
+    sun: INFO
+    javax: INFO

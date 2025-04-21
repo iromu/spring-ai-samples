@@ -37,11 +37,11 @@ class ChatController {
     @RequestMapping(value = "api/chat", method = {RequestMethod.POST})
     Flux<String> generateStream(@RequestBody(required = false) Input messageBody) {
         log.info(messageBody.message);
-        return chatbot.stream(messageBody.message).map(chat -> {
+        return chatbot.stream(messageBody.id, messageBody.message).map(chat -> {
             return chat.getResult().getOutput().getText();
         });
     }
 
-    record Input(String message) {
+    record Input(String id, String message) {
     }
 }
