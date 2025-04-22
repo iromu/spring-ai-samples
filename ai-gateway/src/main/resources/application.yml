@@ -1,0 +1,25 @@
+server:
+  port: 11888
+
+spring.cloud.gateway.httpclient.websocket.max-frame-payload-length: 524288
+spring.cloud.loadbalancer.ribbon.enabled: false
+
+spring:
+  application:
+    name: ai-spring-gateway
+
+
+ai:
+  urls:
+    - "http://localhost:7770"
+    - "http://localhost:7771"
+    - "http://localhost:7772"
+    - "http://localhost:7773"
+    - "http://localhost:7774"
+    - "http://localhost:7775"
+
+
+management.endpoint.gateway.enabled: true # default value
+management.endpoints.web.exposure.include: gateway
+
+spring.profiles.active: local

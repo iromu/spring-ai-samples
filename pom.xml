@@ -18,6 +18,8 @@
         <module>mini-chat-ui</module>
         <module>rag</module>
         <module>chat</module>
+        <module>ai-gateway</module>
+        <module>libs</module>
     </modules>
 
     <properties>

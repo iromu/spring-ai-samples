@@ -11,9 +11,9 @@ spring:
     ollama:
       chat:
         options:
-          model: llama3
+          model: llama3.1:8b
       embedding:
-        model: llama3
+        model: llama3.1:8b
   docker:
     compose:
       lifecycle-management: start_only

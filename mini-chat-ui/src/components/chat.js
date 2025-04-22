@@ -1,4 +1,4 @@
-import {ref, watch} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import axios from 'axios'
 import {marked} from 'marked'
 
@@ -8,13 +8,15 @@ export default function useChat() {
 
     const userInput = ref('')
 
-    const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
+    const ollama = import.meta.env.VITE_OLLAMA || ''
+    // const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
+    const endpoints = ref([])
     const selectedEndpoint = ref(endpoints[0]?.value || '')
     const loading = ref(false)
     let controller = null
     // Object to store message history per endpoint
     const histories = ref(
-        Object.fromEntries(endpoints.map(e => [e.value, []]))
+        Object.fromEntries(endpoints.value.map(e => [e.value, []]))
     )
 
     const messages = ref(histories.value[selectedEndpoint.value]) // active view
@@ -23,6 +25,35 @@ export default function useChat() {
     const formattedMessage = ref('')
     const id = crypto.randomUUID()
     const fetchedInfoEndpoints = new Set()
+
+
+    const fetchOllamaEndpoints = async () => {
+        try {
+            const res = await axios.get(ollama + '/api/tags')
+            const tags = res.data?.models || []
+
+            // Create endpoint objects assuming same host base
+            endpoints.value = tags.map(tag => ({
+                label: tag.name,
+                value: `${ollama}/api/chat`
+            }))
+
+            // Set default
+            if (endpoints.value.length > 0) {
+                selectedEndpoint.value = endpoints.value[0]
+                endpoints.value.forEach(e => {
+                    histories.value[e.value] = []
+                })
+                messages.value = histories.value[selectedEndpoint.value]
+            }
+        } catch (err) {
+            console.error('Failed to fetch endpoints from /api/tags:', err)
+        }
+    }
+
+    onMounted(() => {
+        fetchOllamaEndpoints()
+    })
 
     const fetchEndpointInfo = async (endpoint) => {
         if (!fetchedInfoEndpoints.has(endpoint)) {
@@ -55,11 +86,11 @@ export default function useChat() {
     // Watch for endpoint changes
     watch(selectedEndpoint, (newVal) => {
         messages.value = histories.value[newVal]
-        fetchEndpointInfo(newVal)
+        //fetchEndpointInfo(newVal)
     })
 
     // 🔥 Trigger initial fetch for default endpoint
-    fetchEndpointInfo(selectedEndpoint.value)
+    //fetchEndpointInfo(selectedEndpoint.value)
 
 
     const sendMessage = async () => {
@@ -90,8 +121,9 @@ export default function useChat() {
             const response = await axios.post(
                 selectedEndpoint.value,
                 {
-                    id,
-                    message
+                    id: id,
+                    model: selectedEndpoint.value.label,
+                    message: message
                 },
                 {
                     headers: {Accept: 'text/event-stream'},

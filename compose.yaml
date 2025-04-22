@@ -43,6 +43,7 @@ services:
       - "8000:8080"
     environment:
       WEBUI_AUTH: False
+      OLLAMA_BASE_URL: http://host.docker.internal:11888
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -55,22 +56,22 @@ services:
 # This makes the rest endpoints "hang" until the next message shows on docker:
 # msg="llama runner started in 149.95 seconds"
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    volumes:
-      - ./.ollama:/root/.ollama
-    tty: true
-    entrypoint: [ "/usr/bin/bash", "/root/.ollama/ollama.sh" ]
-    ports:
-      - 11434
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
+#  ollama:
+#    image: ollama/ollama:latest
+#    container_name: ollama
+#    volumes:
+#      - ./.ollama:/root/.ollama
+#    tty: true
+#    entrypoint: [ "/usr/bin/bash", "/root/.ollama/ollama.sh" ]
+#    ports:
+#      - 11434
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [ gpu ]
 
 
 volumes:
