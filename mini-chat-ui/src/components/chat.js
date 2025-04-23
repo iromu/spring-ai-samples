@@ -151,11 +151,9 @@ export default function useChat() {
                 done = readerDone
 
                 if (value) {
-
                     const lines = value.split('\n').filter(Boolean)
                     for (const line of lines) {
                         const parsed = JSON.parse(line)
-                        console.log(parsed)
                         let cleanedValue = parsed.message.content
 
                         const tokens = cleanedValue.trim().split(/\s+/).length

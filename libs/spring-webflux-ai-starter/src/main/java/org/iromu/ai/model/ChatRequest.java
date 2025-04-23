@@ -5,9 +5,13 @@ import java.util.Map;
 
 public record ChatRequest(
         String model,
-        List<Map<String, String>> messages,
+        List<Message> messages,
         boolean stream,
         String system,
         Map<String, Object> options
 ) {
+    public record Message(
+            String role, String content
+    ) {
+    }
 }

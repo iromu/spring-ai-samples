@@ -1,4 +1,4 @@
-package org.iromu.ai.model;
+package org.iromu.ai.model.ollama;
 
 public record ModelTag(
         String name,

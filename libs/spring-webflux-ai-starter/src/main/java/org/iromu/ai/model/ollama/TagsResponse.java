@@ -1,4 +1,4 @@
-package org.iromu.ai.model;
+package org.iromu.ai.model.ollama;
 
 import java.util.List;
 

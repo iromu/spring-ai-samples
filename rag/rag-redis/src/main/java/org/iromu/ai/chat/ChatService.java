@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.util.Map;
-
 @Service
 @Slf4j
 class ChatService implements OllamaService {
@@ -23,8 +21,8 @@ class ChatService implements OllamaService {
     }
 
     public Flux<ChatResponse> stream(ChatRequest request) {
-        Map<String, String> userMessage = request.messages().getLast();
-        return chatbot.stream(userMessage.get("content"));
+        ChatRequest.Message userMessage = request.messages().getLast();
+        return chatbot.stream(userMessage.content());
     }
 
 }

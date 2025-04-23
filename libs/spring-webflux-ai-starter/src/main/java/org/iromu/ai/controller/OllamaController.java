@@ -1,6 +1,7 @@
 package org.iromu.ai.controller;
 
-import org.iromu.ai.model.*;
+import org.iromu.ai.model.ChatRequest;
+import org.iromu.ai.model.ollama.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping({"/api", "/v1"})
+@RequestMapping("/api")
 public interface OllamaController {
 
     @GetMapping("/tags")

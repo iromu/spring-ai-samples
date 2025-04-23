@@ -1,7 +1,8 @@
 package org.iromu.ai.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.iromu.ai.model.*;
+import org.iromu.ai.model.ChatRequest;
+import org.iromu.ai.model.ollama.*;
 import org.iromu.ai.service.OllamaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -83,7 +84,7 @@ public class DefaultOllamaController implements OllamaController {
 
     public Flux<ChatStreamResponse> chat2(@RequestBody ChatRequest request) {
         log.info("Default chat {}", request);
-        String lastMessage = request.messages().get(request.messages().size() - 1).get("content");
+        String lastMessage = request.messages().get(request.messages().size() - 1).content();
         String modelName = request.model() != null ? request.model() : "gpt-neo:latest";
 
         // Timestamp for all chunks

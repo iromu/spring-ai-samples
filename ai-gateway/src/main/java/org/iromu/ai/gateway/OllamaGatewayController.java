@@ -3,9 +3,9 @@ package org.iromu.ai.gateway;
 import lombok.extern.slf4j.Slf4j;
 import org.iromu.ai.controller.OllamaController;
 import org.iromu.ai.model.ChatRequest;
-import org.iromu.ai.model.ChatStreamResponse;
-import org.iromu.ai.model.ModelTag;
-import org.iromu.ai.model.TagsResponse;
+import org.iromu.ai.model.ollama.ChatStreamResponse;
+import org.iromu.ai.model.ollama.ModelTag;
+import org.iromu.ai.model.ollama.TagsResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,38 +21,23 @@ import java.util.List;
 @RestController
 @Slf4j
 @CrossOrigin(origins = "*")
-@RequestMapping({"/api", "/v1"})
+@RequestMapping({"/api"})
 public class OllamaGatewayController implements OllamaController {
 
-
-    private final List<String> urls;
-
     private final WebClient.Builder webClientBuilder;
-    private Flux<MetaTagResponse> tags;
 
-    public OllamaGatewayController(AiConfig aiConfig, WebClient.Builder webClientBuilder) {
-        this.urls = aiConfig.getUrls();
+    private final TagDiscoveryService tagDiscoveryService;
+
+    public OllamaGatewayController(WebClient.Builder webClientBuilder,
+                                   TagDiscoveryService tagDiscoveryService) {
         this.webClientBuilder = webClientBuilder;
-        discover();
+        this.tagDiscoveryService = tagDiscoveryService;
     }
 
-    private void discover() {
-        this.tags = Flux.fromIterable(urls)
-                .flatMap(url -> {
-                    log.info("{}/api/tags", url);
-                    return webClientBuilder.baseUrl(url).build()
-                            .get()
-                            .uri("/api/tags")
-                            .accept(MediaType.APPLICATION_JSON)
-                            .exchangeToMono(response -> response.bodyToMono(TagsResponse.class))
-                            .onErrorReturn(new TagsResponse(new ArrayList<>()))
-                            .map(tagsResponse -> new MetaTagResponse(url, tagsResponse));
-                }).cache();
-    }
 
-    private TagsResponse aggregateResponses(List<MetaTagResponse> responses) {
+    private TagsResponse aggregateResponses(List<TagDiscoveryService.MetaTagResponse> responses) {
         List<ModelTag> models = new ArrayList<>();
-        for (MetaTagResponse response : responses) {
+        for (TagDiscoveryService.MetaTagResponse response : responses) {
             if (response != null && response.tagsResponse().models() != null)
                 models.addAll(response.tagsResponse().models());
         }
@@ -61,7 +46,7 @@ public class OllamaGatewayController implements OllamaController {
     }
 
     public Mono<TagsResponse> getTags() {
-        return this.tags.collectList()
+        return this.tagDiscoveryService.getTags().collectList()
                 .map(this::aggregateResponses)
                 .doOnNext(o -> log.info("{}", o));
     }
@@ -70,8 +55,8 @@ public class OllamaGatewayController implements OllamaController {
         log.info("{}", request);
         ModelTag modelName = new ModelTag(request.model(), null);
 
-        return tags
-                .filter(t -> t != null && t.tagsResponse().models() != null && t.tagsResponse.models().contains(modelName))
+        return this.tagDiscoveryService.getTags()
+                .filter(t -> t != null && t.tagsResponse().models() != null && t.tagsResponse().models().contains(modelName))
                 .flatMap(o -> {
                             log.info("{}/api/chat", o.url());
                             return webClientBuilder.baseUrl(o.url()).build()
@@ -86,6 +71,4 @@ public class OllamaGatewayController implements OllamaController {
 
     }
 
-    private record MetaTagResponse(String url, TagsResponse tagsResponse) {
-    }
 }

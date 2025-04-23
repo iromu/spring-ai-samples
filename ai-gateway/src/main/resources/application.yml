@@ -7,7 +7,13 @@ spring.cloud.loadbalancer.ribbon.enabled: false
 spring:
   application:
     name: ai-spring-gateway
-
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      fail-on-unknown-properties: false
+    serialization:
+      write-dates-as-timestamps: false
+      fail-on-empty-beans: false
 
 ai:
   urls:
