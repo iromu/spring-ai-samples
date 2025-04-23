@@ -11,7 +11,7 @@ applications.
     - ollama-chat-advanced: Advanced Ollama chat features
 - **libs**: Shared libraries and starters
     - spring-webflux-ai-starter: Spring WebFlux integration for AI services
-- **mcp**: Model Control Plane implementation
+- **mcp**: Model Context Protocol (MCP)
 - **rag**: Retrieval-Augmented Generation examples
 - **mini-chat-ui**: Minimalistic chat user interface
 
