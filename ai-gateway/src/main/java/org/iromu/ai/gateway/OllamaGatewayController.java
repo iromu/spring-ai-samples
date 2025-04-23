@@ -48,7 +48,7 @@ public class OllamaGatewayController implements OllamaController {
     public Mono<TagsResponse> getTags() {
         return this.tagDiscoveryService.getTags().collectList()
                 .map(this::aggregateResponses)
-                .doOnNext(o -> log.info("{}", o));
+                .doOnNext(o -> log.debug("{}", o));
     }
 
     public Flux<ChatStreamResponse> chat(@RequestBody ChatRequest request) {

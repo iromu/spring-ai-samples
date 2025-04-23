@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import jakarta.annotation.PostConstruct;
-import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,21 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class OpenApiToolRegistry {
 
-    @Data
-    public static class OperationMeta {
-        private final String operationId;
-        private final String baseUrl;
-        private final String path;
-        private final PathItem.HttpMethod method;
-        private final Operation operation;
-
-        public OperationMeta(String operationId, String baseUrl, String path, PathItem.HttpMethod method, Operation operation) {
-            this.operationId = operationId;
-            this.baseUrl = baseUrl;
-            this.path = path;
-            this.method = method;
-            this.operation = operation;
-        }
+    public record OperationMeta(String operationId, String baseUrl, String path, PathItem.HttpMethod method,
+                                Operation operation) {
     }
 
     private final OpenApiConfig openApiConfig;
@@ -65,17 +51,15 @@ public class OpenApiToolRegistry {
 
         String baseUrl = extractBaseUrl(swaggerUrl);
 
-        openAPI.getPaths().forEach((path, pathItem) -> {
-            pathItem.readOperationsMap().forEach((method, operation) -> {
-                if (operation.getOperationId() != null) {
-                    OperationMeta meta = new OperationMeta(
-                            operation.getOperationId(), baseUrl, path, method, operation
-                    );
-                    operationMap.put(operation.getOperationId(), meta);
-                    log.info("Added {} {} {} {}", baseUrl, method, path, operation.getOperationId());
-                }
-            });
-        });
+        openAPI.getPaths().forEach((path, pathItem) -> pathItem.readOperationsMap().forEach((method, operation) -> {
+            if (operation.getOperationId() != null) {
+                OperationMeta meta = new OperationMeta(
+                        operation.getOperationId(), baseUrl, path, method, operation
+                );
+                operationMap.put(operation.getOperationId(), meta);
+                log.info("Added {} {} {} {}", baseUrl, method, path, operation.getOperationId());
+            }
+        }));
     }
 
     private String extractBaseUrl(String swaggerUrl) {

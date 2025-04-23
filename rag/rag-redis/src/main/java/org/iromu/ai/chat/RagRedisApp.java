@@ -67,7 +67,7 @@ public class RagRedisApp {
 
         if (!matchingKeys.isEmpty()) {
             String[] array = matchingKeys.toArray((new String[0]));
-            log.info("Deleting keys: {}", array);
+            log.info("Deleting keys: {}", (Object) array);
             jedis.del(array);
         }
     }

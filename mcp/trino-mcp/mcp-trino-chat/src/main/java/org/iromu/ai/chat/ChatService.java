@@ -3,6 +3,7 @@ package org.iromu.ai.chat;
 import lombok.extern.slf4j.Slf4j;
 import org.iromu.ai.model.ChatRequest;
 import org.iromu.ai.service.OllamaService;
+import org.iromu.ai.utils.RequestUtils;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -18,8 +19,7 @@ class ChatService implements OllamaService {
     }
 
     public Flux<ChatResponse> stream(ChatRequest request) {
-        ChatRequest.Message userMessage = request.messages().getLast();
-        return chatbot.stream("1", userMessage.content());
+        return chatbot.stream("1", RequestUtils.getMessages(request));
     }
 
 }

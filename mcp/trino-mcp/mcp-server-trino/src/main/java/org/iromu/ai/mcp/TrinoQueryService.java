@@ -46,8 +46,6 @@ public class TrinoQueryService {
      * Constructs a new {@code TrinoQueryService} with required dependencies.
      *
      * @param jdbcTemplate the {@code JdbcTemplate} used for executing SQL queries
-     * @param fixer        the {@code GraphQLSchemaFixer} used for sanitizing and restoring
-     *                     schema/table names
      */
     public TrinoQueryService(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -91,7 +89,7 @@ public class TrinoQueryService {
         try {
             filtersMap = objectMapper.readValue(filters, new TypeReference<>() {
             });
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException ignored) {
         }
 
         if (filtersMap != null && !filtersMap.isEmpty()) {
@@ -145,20 +143,10 @@ public class TrinoQueryService {
 
         return result;
 
-//        List<String> result = new ArrayList<>();
-//        for (Map<String, Object> map : maps) {
-//            // Join values into a CSV-like string
-//            String row = map.values().stream()
-//                    .map(String::valueOf)
-//                    .collect(Collectors.joining(","));
-//            result.add(row);
-//        }
-//
-//        return result;
     }
 
     @Data
-    public class Field {
+    public static class Field {
         private String name;
         private Object value;
 
@@ -169,7 +157,7 @@ public class TrinoQueryService {
     }
 
     @Data
-    public class Row<T> {
+    public static class Row<T> {
         private T fields;
 
         public Row(T fields) {

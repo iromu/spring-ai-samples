@@ -1,7 +1,7 @@
 package org.iromu.ai.chat;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,11 +45,11 @@ class Chatbot {
         this.vectorStore = vectorStore;
     }
 
-    public Flux<ChatResponse> stream(String message) {
+    public Flux<ChatResponse> stream(List<Message> messages) {
 
         Mono<List<Document>> listMono = Mono.fromCallable(() -> {
             // Blocking call here
-            return vectorStore.similaritySearch(message);
+            return vectorStore.similaritySearch(messages.getLast().getText());
         }).subscribeOn(Schedulers.boundedElastic());
 
         return listMono.flatMapMany(listOfSimilarDocuments -> {
@@ -61,12 +62,14 @@ class Chatbot {
             var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
                     .createMessage(Map.of("documents", documents));
             log.info("The System prompt has {} chars", systemMessage.getText().length());
-            var userMessage = new UserMessage(message);
-            log.info("The User prompt has {} chars", userMessage.getText().length());
-            var prompt = new Prompt(List.of(systemMessage, userMessage));
-            return chatModel.stream(prompt)
-                    // .doOnNext(chatResponse -> log.info("{}", chatResponse.getResult().getOutput().getText()))
-                    ;
+
+
+            List<Message> messageList = new ArrayList<>();
+            messageList.add(systemMessage);
+            messageList.addAll(messages);
+
+            var prompt = new Prompt(messageList);
+            return chatModel.stream(prompt);
         });
     }
 }

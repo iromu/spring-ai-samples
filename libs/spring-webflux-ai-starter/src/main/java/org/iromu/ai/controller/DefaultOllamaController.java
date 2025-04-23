@@ -40,7 +40,7 @@ public class DefaultOllamaController implements OllamaController {
     @Override
     public Mono<TagsResponse> getTags() {
         ModelTag modelTag = new ModelTag(appName + "/" + model, null);
-        log.info("Default getTags() {}", modelTag);
+        log.debug("Default getTags() {}", modelTag);
         return Mono.just(new TagsResponse(
                 List.of(
                         modelTag
@@ -84,7 +84,7 @@ public class DefaultOllamaController implements OllamaController {
 
     public Flux<ChatStreamResponse> chat2(@RequestBody ChatRequest request) {
         log.info("Default chat {}", request);
-        String lastMessage = request.messages().get(request.messages().size() - 1).content();
+        String lastMessage = request.messages().getLast().content();
         String modelName = request.model() != null ? request.model() : "gpt-neo:latest";
 
         // Timestamp for all chunks

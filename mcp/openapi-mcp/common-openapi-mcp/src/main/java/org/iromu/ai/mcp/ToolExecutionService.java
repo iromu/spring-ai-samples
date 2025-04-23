@@ -32,16 +32,16 @@ public class ToolExecutionService {
         }
 
         var meta = metaOpt.get();
-        HttpMethod method = HttpMethod.valueOf(meta.getMethod().name());
+        HttpMethod method = HttpMethod.valueOf(meta.method().name());
 
-        String resolvedPath = resolvePath(meta.getPath(), args);
-        URI fullUri = buildUriWithQueryParams(meta.getBaseUrl() + resolvedPath, args, meta.getOperation());
+        String resolvedPath = resolvePath(meta.path(), args);
+        URI fullUri = buildUriWithQueryParams(meta.baseUrl() + resolvedPath, args, meta.operation());
 
-        WebClient webClient = webClientBuilder.baseUrl(meta.getBaseUrl()).build();
+        WebClient webClient = webClientBuilder.baseUrl(meta.baseUrl()).build();
         WebClient.RequestBodySpec request = webClient.method(method).uri(fullUri);
 
-        if (meta.getOperation().getRequestBody() != null) {
-            ObjectNode body = buildJsonBody(meta.getOperation().getRequestBody(), args);
+        if (meta.operation().getRequestBody() != null) {
+            ObjectNode body = buildJsonBody(meta.operation().getRequestBody(), args);
             return request.bodyValue(body).retrieve().bodyToMono(String.class);
         } else {
             return request.retrieve().bodyToMono(String.class);
@@ -51,7 +51,7 @@ public class ToolExecutionService {
     private String resolvePath(String path, Map<String, Object> args) {
         Pattern pattern = Pattern.compile("\\{(\\w+)}");
         Matcher matcher = pattern.matcher(path);
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         while (matcher.find()) {
             String key = matcher.group(1);
@@ -64,7 +64,7 @@ public class ToolExecutionService {
     }
 
     private URI buildUriWithQueryParams(String basePath, Map<String, Object> args, Operation operation) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(basePath);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(basePath);
         List<Parameter> parameters = operation.getParameters();
         if (parameters != null) {
             for (Parameter param : parameters) {

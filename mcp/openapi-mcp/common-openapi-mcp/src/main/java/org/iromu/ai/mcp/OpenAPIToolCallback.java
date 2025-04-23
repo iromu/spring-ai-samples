@@ -13,13 +13,11 @@ import java.util.Map;
 @Slf4j
 public class OpenAPIToolCallback implements ToolCallback {
     private final ToolExecutionService toolExecutionService;
-    private final String path;
     private final ToolDefinition toolDefinition;
     private final Operation operation;
 
     public OpenAPIToolCallback(ToolExecutionService toolExecutionService, String baseUrl, String path, Operation operation) {
         this.toolExecutionService = toolExecutionService;
-        this.path = path;
         this.operation = operation;
         var name = operation.getOperationId();
         var description = operation.getDescription();

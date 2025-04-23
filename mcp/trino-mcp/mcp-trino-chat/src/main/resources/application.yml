@@ -13,9 +13,6 @@ spring:
           connections:
             mcp-server-trino:
               url: http://localhost:7001
-  docker:
-    compose:
-      lifecycle-management: start_only
 
 server:
   port: 7774

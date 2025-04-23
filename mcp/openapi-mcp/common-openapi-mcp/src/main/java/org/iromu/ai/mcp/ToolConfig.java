@@ -23,7 +23,7 @@ public class ToolConfig {
         List<ToolCallback> tools = new ArrayList<>();
 
         registry.getOperationMap().forEach((s, operationMeta) -> tools.
-                add(new OpenAPIToolCallback(toolExecutionService, operationMeta.getBaseUrl(), operationMeta.getPath(), operationMeta.getOperation())));
+                add(new OpenAPIToolCallback(toolExecutionService, operationMeta.baseUrl(), operationMeta.path(), operationMeta.operation())));
 
         return ToolCallbackProvider.from(tools);
     }

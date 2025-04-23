@@ -6,8 +6,5 @@ spring:
       chat:
         options:
           model: llama3.1:8b
-  docker:
-    compose:
-      lifecycle-management: start_only
 server:
   port: 7770

@@ -21,7 +21,7 @@ public class McpTrinoChatApp {
                 log.info(logingMessage.data());
                 return null;
             });
-            log.info("Customizing " + name);
+            log.info("Customizing {}", name);
         };
     }
 }

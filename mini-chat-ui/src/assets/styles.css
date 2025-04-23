@@ -151,8 +151,7 @@ h2, h3 {
 }
 
 .message p {
-    margin: 0;
-    margin-bottom: 12px;
+    margin: 0 0 12px;
 }
 
 .message strong {

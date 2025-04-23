@@ -54,8 +54,7 @@ public class TrinoSchemaService {
     @Tool(description = "Get catalogs")
     public List<String> getCatalogs() {
         log.info("SHOW CATALOGS");
-        List<String> catalogs = jdbcTemplate.queryForList("SHOW CATALOGS", String.class);
-        return catalogs;
+        return jdbcTemplate.queryForList("SHOW CATALOGS", String.class);
     }
 
     /**
@@ -69,9 +68,8 @@ public class TrinoSchemaService {
     public List<String> getSchemas(String _catalog) {
         log.info("SHOW SCHEMAS FROM {}", _catalog);
         try {
-            List<String> schemas = jdbcTemplate
+            return jdbcTemplate
                     .queryForList("SHOW SCHEMAS FROM " + _catalog, String.class);
-            return schemas;
         } catch (Exception e) {
             log.error("{} {}", _catalog, e.getMessage());
             return new ArrayList<>();
@@ -91,10 +89,9 @@ public class TrinoSchemaService {
     public List<String> getTables(String _catalog, String _schema) {
         log.info("SHOW TABLES FROM {}.{}", _catalog, _schema);
         try {
-            List<String> tables = jdbcTemplate.queryForList("SHOW TABLES FROM " + _catalog
-                    + "." + _schema, String.class);
 
-            return tables;
+            return jdbcTemplate.queryForList("SHOW TABLES FROM " + _catalog
+                    + "." + _schema, String.class);
         } catch (Exception e) {
             log.error("{}.{} {}", _catalog, _schema, e.getMessage());
             return new ArrayList<>();
@@ -114,11 +111,10 @@ public class TrinoSchemaService {
     public List<Map<String, Object>> getColumns(String _catalog, String _schema, String _table) {
         log.info("DESCRIBE {}.{}.{}", _catalog, _schema, _table);
         try {
-            List<Map<String, Object>> columns = jdbcTemplate
+
+            return jdbcTemplate
                     .queryForList("DESCRIBE " + (_catalog) + "."
                             + (_schema) + "." + (_table));
-
-            return columns;
         } catch (Exception e) {
             log.error("{}.{}.{} {}", _catalog, _schema, _table, e.getMessage());
             return new ArrayList<>();

@@ -29,7 +29,7 @@ public class RagRedisAppAdvanced {
 
     @Bean
     ApplicationListener<ApplicationReadyEvent> onApplicationReadyEvent(RedisVectorStore vectorStore,
-                                                                       @Value("classpath:medicaid-wa-faqs.pdf") Resource resource,
+                                                                       @Value("classpath:pdf/*.pdf") Resource[] resources,
                                                                        @Value("${spring.ai.vectorstore.redis.prefix}") String prefix) {
         return event -> {
             cleanupRedis(vectorStore, prefix);
@@ -39,15 +39,19 @@ public class RagRedisAppAdvanced {
                             .build())
                     .build();
 
-            var documentReader = new ParagraphPdfDocumentReader(resource, config);
-            var textSplitter = new TokenTextSplitter();
-            var documentList = textSplitter.apply(documentReader.get());
-            log.info("Adding {} documents to the vector store", documentList.size());
-            for (Document document : documentList) {
-                log.info("Adding document {}", document.getId());
-                vectorStore.accept(Collections.singletonList(document));
+            int count = 0;
+            for (Resource resource : resources) {
+                var documentReader = new ParagraphPdfDocumentReader(resource, config);
+                var textSplitter = new TokenTextSplitter();
+                var documentList = textSplitter.apply(documentReader.get());
+                count += documentList.size();
+                log.info("Adding {} documents to the vector store", documentList.size());
+                for (Document document : documentList) {
+                    log.debug("Adding document {}", document.getId());
+                    vectorStore.accept(Collections.singletonList(document));
+                }
             }
-            log.info("Added {} documents to the vector store", documentList.size());
+            log.info("Added {} documents to the vector store", count);
         };
     }
 
@@ -65,7 +69,7 @@ public class RagRedisAppAdvanced {
 
         if (!matchingKeys.isEmpty()) {
             String[] array = matchingKeys.toArray((new String[0]));
-            log.info("Deleting keys: {}", array);
+            log.info("Deleting keys: {}", (Object) array);
             jedis.del(array);
         }
     }

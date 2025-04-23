@@ -2,7 +2,6 @@ server:
   port: 11888
 
 spring.cloud.gateway.httpclient.websocket.max-frame-payload-length: 524288
-spring.cloud.loadbalancer.ribbon.enabled: false
 
 spring:
   application:

@@ -1,13 +1,15 @@
 spring:
   application:
     name: rag-redis-advanced
+  data:
+    redis:
+      url: redis://localhost:9736
   ai:
     vectorstore:
       redis:
-        uri: redis://localhost:9736
-        index: rag-advanced-index
         prefix: "rag-advanced:"
         initialize-schema: true
+        index-name: rag-advanced-index
     ollama:
       chat:
         options:

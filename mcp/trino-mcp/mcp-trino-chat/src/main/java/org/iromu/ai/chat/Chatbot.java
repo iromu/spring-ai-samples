@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.mcp.AsyncMcpToolCallbackProvider;
@@ -21,7 +22,6 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 class Chatbot {
 
     private final ChatClient chatClient;
-    private final ChatClient.Builder chatClientBuilder;
 
     Chatbot(ChatModel chatModel, List<McpAsyncClient> mcpClients) {
         for (McpAsyncClient mcpClient : mcpClients) {
@@ -36,15 +36,15 @@ class Chatbot {
         var mcpToolProvider = new AsyncMcpToolCallbackProvider(mcpClients);
         MessageChatMemoryAdvisor memoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
         SimpleLoggerAdvisor simpleLoggerAdvisor = new SimpleLoggerAdvisor();
-        chatClientBuilder = ChatClient.builder(chatModel)
+        ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
                 .defaultTools(mcpToolProvider)
                 .defaultAdvisors(memoryAdvisor, simpleLoggerAdvisor);
         this.chatClient = chatClientBuilder.build();
         log.info("Chatbot built");
     }
 
-    public Flux<ChatResponse> stream(String id, String message) {
-        return chatClient.prompt(message)
+    public Flux<ChatResponse> stream(String id, List<Message> messages) {
+        return chatClient.prompt(messages.getLast().getText())
                 .advisors(advisorSpec -> advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id))
                 .stream().chatResponse();
     }

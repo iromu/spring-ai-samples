@@ -13,9 +13,6 @@ spring:
           connections:
             mcp-server-petstore:
               url: http://localhost:7002
-  docker:
-    compose:
-      lifecycle-management: start_only
 
 server:
   port: 7775

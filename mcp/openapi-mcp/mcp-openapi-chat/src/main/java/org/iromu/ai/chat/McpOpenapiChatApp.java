@@ -21,7 +21,7 @@ public class McpOpenapiChatApp {
                 log.info(logingMessage.data());
                 return null;
             });
-            log.info("Customizing " + name);
+            log.info("Customizing {}", name);
         };
     }
 }

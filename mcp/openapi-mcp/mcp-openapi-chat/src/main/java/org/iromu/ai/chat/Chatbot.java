@@ -18,7 +18,6 @@ import java.util.List;
 class Chatbot {
 
     private final ChatClient chatClient;
-    private final ChatClient.Builder chatClientBuilder;
 
     Chatbot(ChatModel chatModel, List<McpAsyncClient> mcpClients) {
         for (McpAsyncClient mcpClient : mcpClients) {
@@ -32,7 +31,7 @@ class Chatbot {
 
         var mcpToolProvider = new AsyncMcpToolCallbackProvider(mcpClients);
         MessageChatMemoryAdvisor memoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
-        chatClientBuilder = ChatClient.builder(chatModel)
+        ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
                 .defaultTools(mcpToolProvider)
                 .defaultAdvisors(memoryAdvisor);
         this.chatClient = chatClientBuilder.build();
