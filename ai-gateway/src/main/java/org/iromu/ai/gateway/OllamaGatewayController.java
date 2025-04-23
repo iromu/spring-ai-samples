@@ -18,6 +18,14 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The OllamaGatewayController class acts as a REST controller that handles API requests and
+ * communicates with the TagDiscoveryService to manage operations related to tags and chats.
+ * This controller provides endpoints for retrieving tags and performing chat operations.
+ *
+ * An implementation of the OllamaController interface, it uses a WebClient.Builder for
+ * constructing HTTP requests and integrates with TagDiscoveryService for discovering tags.
+ */
 @RestController
 @Slf4j
 @CrossOrigin(origins = "*")

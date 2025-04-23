@@ -17,6 +17,27 @@ import java.util.List;
 import java.util.Optional;
 
 
+/**
+ * The DefaultOllamaController implements the OllamaController interface and provides
+ * REST endpoints for managing chat operations, retrieving metadata, and model-related
+ * information. This controller interacts with the underlying OllamaService to process
+ * requests.
+ *
+ * Constructor:
+ * - Initializes the controller with application metadata, model configuration, and the
+ *   service dependency.
+ *
+ * Methods:
+ * - getTags: Retrieves a list of tags identifying the current application and model.
+ * - getVersion: Provides the version of the application, fetched from build properties.
+ * - chat: Handles chat requests by streaming responses from the underlying model service.
+ * - chat2: Provides another implementation for streaming chat responses using mock data
+ *   for illustrative purposes.
+ *
+ * Logging:
+ * - Uses various log levels (debug, info, trace) to track method executions and output
+ *   details of operations.
+ */
 @Slf4j
 public class DefaultOllamaController implements OllamaController {
 

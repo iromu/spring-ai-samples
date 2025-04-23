@@ -1,5 +1,24 @@
 package org.iromu.ai.model.ollama;
 
+/**
+ * Represents the response of a streaming chat operation.
+ *
+ * This record encapsulates the details of the response for a chat stream interaction,
+ * including the model identifier, timestamps, message details, and evaluation metrics.
+ *
+ * Fields:
+ *
+ * - model: The identifier of the model used for the chat interaction.
+ * - created_at: The timestamp indicating when the response was created.
+ * - message: The chat message associated with the response.
+ * - done: A boolean flag indicating whether the chat stream is completed.
+ * - total_duration: The total duration of the chat operation in milliseconds.
+ * - load_duration: The duration spent loading resources for the chat operation in milliseconds.
+ * - prompt_eval_count: The number of prompt evaluations performed during the interaction.
+ * - prompt_eval_duration: The time taken for evaluating prompts in milliseconds.
+ * - eval_count: The total number of evaluations executed during the interaction.
+ * - eval_duration: The total time taken for all evaluations in milliseconds.
+ */
 public record ChatStreamResponse(
         String model,
         String created_at,

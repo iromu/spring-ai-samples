@@ -1,22 +1,20 @@
-## Setup
+# Spring AI Samples
 
-For better experience, download ollama from https://ollama.com/download
-and pull llama3.1:8b model.
+A collection of Spring AI integration examples and utilities demonstrating various AI capabilities with Spring Boot
+applications.
 
-Or you can uncomment the ollama container on compose.yaml
+## Project Structure
 
-## Troubleshooting
+- **ai-gateway**: API Gateway for AI services
+- **chat**: Chat applications implementations
+    - ollama-chat: Basic Ollama chat implementation
+    - ollama-chat-advanced: Advanced Ollama chat features
+- **libs**: Shared libraries and starters
+    - spring-webflux-ai-starter: Spring WebFlux integration for AI services
+- **mcp**: Model Control Plane implementation
+- **rag**: Retrieval-Augmented Generation examples
+- **mini-chat-ui**: Minimalistic chat user interface
 
-### If Spring app does not finishes loading:
+## Documentation
 
-Check on docker ollama for the message
-
-    2024-07-11 00:26:57 time=2024-07-10T23:26:57.317Z level=INFO source=server.go:594 msg="waiting for server to become available" status="llm server loading model"
-
-*Check enough GPU RAM is available to load the model*
-
-### Rest endpoints are taking too long
-
-Check docker log. Rest endpoints will start replying when this message appears on ollama log:
-
-    msg="llama runner started in 149.95 seconds"
+Detailed documentation for each module can be found in their respective directories.

@@ -1,13 +1,28 @@
-# mcp-server-trino
+# MCP Server Trino
 
-`mcp-server-trino` is a reactive, Spring AI-powered metadata query server that integrates
-with [Trino](https://trino.io/) using the JDBC driver. Built using Spring WebFlux and `spring-ai-mcp-server`, this
-server provides asynchronous query capabilities tailored for data platforms and metadata-driven workloads.
+A reactive metadata query server powered by Spring AI that integrates with [Trino](https://trino.io/) through JDBC
+driver. Built on Spring WebFlux and spring-ai-mcp-server frameworks, this server enables asynchronous querying for data
+platforms and metadata-driven workloads.
 
+## Features
 
----
+### Query Capabilities
 
-## 🧠 What It Does
+- Select and filter data from Trino tables using a structured interface
+- Execute asynchronous queries with reactive programming model
+- Support for complex metadata-driven workloads
 
-- 📊 **Query Tables** — Select and filter data from Trino tables using a structured interface
-- 📁 **Explore Metadata** — List catalogs, schemas, tables, and columns from Trino
+### Metadata Operations
+
+- List available Trino catalogs
+- Browse schema hierarchies
+- Explore table structures
+- Retrieve column definitions and properties
+
+## Architecture
+
+The server leverages Spring WebFlux for reactive processing and connects to Trino using the JDBC driver, providing:
+
+- Non-blocking I/O operations
+- Reactive streams for data handling
+- Integration with Spring AI components

@@ -8,6 +8,22 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+/**
+ * A logging filter that implements the {@link WebFilter} interface to log the details of incoming HTTP requests.
+ *
+ * This filter logs information such as the HTTP method, the request URI, and the remote address of the client.
+ * The logging is performed using SLF4J's {@link Logger}.
+ *
+ * The filter is a Spring-managed component and will be applied as part of the reactive web filter chain.
+ * It ensures that the requests are logged before proceeding to the next filter or handler in the chain.
+ *
+ * Key details logged:
+ * - HTTP Method
+ * - Request URI
+ * - Remote Address
+ *
+ * Implements {@link WebFilter} to enforce reactive request processing.
+ */
 @Component
 public class LoggingFilter implements WebFilter {
 

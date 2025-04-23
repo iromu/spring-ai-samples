@@ -14,6 +14,33 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service responsible for discovering metadata tags from a list of configured URLs.
+ *
+ * The TagDiscoveryService periodically fetches metadata tags from external services
+ * configured via the {@code AiConfig} component. These tags are fetched using a
+ * non-blocking, reactive approach and are made available through a reactive stream.
+ *
+ * This service is initialized with a discovery loop that runs at a fixed interval,
+ * polling the configured endpoints to retrieve metadata tags.
+ *
+ * Core responsibilities:
+ * - Fetch metadata tags from external services at regular intervals.
+ * - Provide real-time access to discovered tags via a reactive stream.
+ * - Handle errors gracefully and return default responses when remote services fail.
+ *
+ * Dependencies:
+ * - Spring's {@link WebClient.Builder} for making HTTP requests.
+ * - {@link AiConfig} to retrieve a list of target URLs for tag discovery.
+ *
+ * Key Methods:
+ * - {@code startDiscoveryLoop}: Initializes the discovery loop that executes at fixed intervals.
+ * - {@code discoverOnce}: Performs a one-time fetch of metadata tags from all configured URLs.
+ *
+ * Records:
+ * - {@code MetaTagResponse}: Represents a response containing metadata tags retrieved
+ *   from a specific URL along with the associated response details.
+ */
 @Service
 @Slf4j
 public class TagDiscoveryService {
