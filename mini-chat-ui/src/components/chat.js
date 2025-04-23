@@ -40,7 +40,7 @@ export default function useChat() {
 
             // Set default
             if (endpoints.value.length > 0) {
-                selectedEndpoint.value = endpoints.value[0]
+                selectedEndpoint.value = endpoints.value[0]?.value || ''
                 endpoints.value.forEach(e => {
                     histories.value[e.value] = []
                 })
@@ -116,17 +116,22 @@ export default function useChat() {
         formattedMessage.value = ''
 
         scrollToBottom()
+        const selected = endpoints.value.find(e => e.value === selectedEndpoint.value)
+        const modelLabel = selected?.label || 'unknown'
 
         try {
             const response = await axios.post(
                 selectedEndpoint.value,
                 {
                     id: id,
-                    model: selectedEndpoint.value.label,
-                    message: message
+                    model: modelLabel,
+                    messages: [
+                        {role: "user", content: message}
+                    ],
+                    stream: true
                 },
                 {
-                    headers: {Accept: 'text/event-stream'},
+                    headers: {Accept: 'application/x-ndjson'},
                     responseType: 'stream',
                     adapter: 'fetch',
                     signal: controller.signal
@@ -146,23 +151,27 @@ export default function useChat() {
                 done = readerDone
 
                 if (value) {
-                    let cleanedValue = value
-                        .replace(/data:/g, '')
-                        .replace(/\n\n$/, '') // remove trailing double newline
 
-                    const tokens = cleanedValue.trim().split(/\s+/).length
-                    tokenCount += tokens
-                    totalDuration.value = ((performance.now() - startTime) / 1000).toFixed(2)
+                    const lines = value.split('\n').filter(Boolean)
+                    for (const line of lines) {
+                        const parsed = JSON.parse(line)
+                        console.log(parsed)
+                        let cleanedValue = parsed.message.content
 
-                    const elapsed = (performance.now() - startTime) / 1000 // seconds
-                    if (elapsed > 0) {
-                        tokensPerSecond.value = (tokenCount / elapsed).toFixed(2)
+                        const tokens = cleanedValue.trim().split(/\s+/).length
+                        tokenCount += tokens
+                        totalDuration.value = ((performance.now() - startTime) / 1000).toFixed(2)
+
+                        const elapsed = (performance.now() - startTime) / 1000 // seconds
+                        if (elapsed > 0) {
+                            tokensPerSecond.value = (tokenCount / elapsed).toFixed(2)
+                        }
+
+                        rawMessage.value += cleanedValue
+                        aiMessage.text = marked(rawMessage.value)
+                        histories.value[selectedEndpoint.value] = [...currentHistory]
+                        messages.value = histories.value[selectedEndpoint.value]
                     }
-
-                    rawMessage.value += cleanedValue
-                    aiMessage.text = marked(rawMessage.value)
-                    histories.value[selectedEndpoint.value] = [...currentHistory]
-                    messages.value = histories.value[selectedEndpoint.value]
                 }
 
                 scrollToBottom()
