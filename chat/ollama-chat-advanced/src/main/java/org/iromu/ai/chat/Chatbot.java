@@ -6,7 +6,6 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
@@ -15,27 +14,27 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
 class Chatbot {
     private final ChatClient chatClient;
     private final ChatClient.Builder chatClientBuilder;
-    private final Map<String, List<Message>> history = new HashMap<>();
 
     Chatbot(ChatModel chatModel) {
-        ChatOptions options = OllamaOptions.builder().temperature(0.1).build();
+        ChatOptions options = ChatOptions.builder().temperature(0.8).build();
         chatClientBuilder = ChatClient.builder(chatModel).defaultOptions(options);
         this.chatClient = chatClientBuilder.build();
     }
 
-    public Flux<ChatResponse> stream(String id, List<Message> messages) {
+    public Flux<ChatResponse> stream(String id, List<Message> messages, Optional<ChatOptions> options) {
+
+
         Query query = Query.builder()
                 .text(messages.getLast().getText())
-                .history(messages)
+                .history(messages.subList(Math.max(messages.size() - 5, 0), messages.size()))
                 .build();
 
         QueryTransformer queryTransformer = CompressionQueryTransformer.builder()
@@ -48,8 +47,12 @@ class Chatbot {
         }).subscribeOn(Schedulers.boundedElastic());
 
         return queryMono.flatMapMany(transformedQuery -> {
-            log.info("{}", transformedQuery.text());
-            return chatClient.prompt(transformedQuery.text()).stream().chatResponse();
+            log.info("CompressionQueryTransformer: {}", transformedQuery.text());
+            ChatClient.ChatClientRequestSpec spec = chatClient.prompt(transformedQuery.text());
+            if (options.isPresent()) {
+                spec.options(options.get());
+            }
+            return spec.stream().chatResponse();
         });
     }
 }

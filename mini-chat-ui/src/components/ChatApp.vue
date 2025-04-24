@@ -7,7 +7,7 @@
     <div class="endpoint-select">
       <label for="endpoint">Select Endpoint:</label>
       <select v-model="selectedEndpoint" id="endpoint" :disabled="loading">
-        <option v-for="endpoint in endpoints" :key="endpoint.value" :value="endpoint.value">
+        <option v-for="endpoint in endpoints" :key="endpoint.label" :value="endpoint.label">
           {{ endpoint.label }}
         </option>
       </select>

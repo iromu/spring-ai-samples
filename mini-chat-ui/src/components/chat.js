@@ -1,53 +1,53 @@
 import {onMounted, ref, watch} from 'vue'
 import axios from 'axios'
 import {marked} from 'marked'
+import TurndownService from 'turndown'
 
 export default function useChat() {
     const tokensPerSecond = ref(0)
     const totalDuration = ref(0) // in seconds
-
+    const turndown = new TurndownService()
     const userInput = ref('')
-
     const ollama = import.meta.env.VITE_OLLAMA || ''
-    // const endpoints = JSON.parse(import.meta.env.VITE_BACKENDS || '[]')
     const endpoints = ref([])
-    const selectedEndpoint = ref(endpoints[0]?.value || '')
+    const selectedEndpoint = ref('')
     const loading = ref(false)
     let controller = null
+
     // Object to store message history per endpoint
-    const histories = ref(
-        Object.fromEntries(endpoints.value.map(e => [e.value, []]))
-    )
-
-    const messages = ref(histories.value[selectedEndpoint.value]) // active view
-
+    const histories = ref({}) // Changed to an object for easier access by label
     const rawMessage = ref('')
     const formattedMessage = ref('')
     const id = crypto.randomUUID()
     const fetchedInfoEndpoints = new Set()
 
+    const messages = ref([]) // Active view for messages
 
     const fetchOllamaEndpoints = async () => {
         try {
             const res = await axios.get(ollama + '/api/tags')
             const tags = res.data?.models || []
 
-            // Create endpoint objects assuming same host base
-            endpoints.value = tags.map(tag => ({
+            // Populate endpoints
+            const newEndpoints = tags.map(tag => ({
                 label: tag.name,
                 value: `${ollama}/api/chat`
             }))
+            endpoints.value = newEndpoints
 
-            // Set default
-            if (endpoints.value.length > 0) {
-                selectedEndpoint.value = endpoints.value[0]?.value || ''
-                endpoints.value.forEach(e => {
-                    histories.value[e.value] = []
+            // Set the default selected endpoint after fetching the endpoints
+            if (newEndpoints.length > 0) {
+                selectedEndpoint.value = newEndpoints[0].label // Set default endpoint
+
+                // Initialize histories object for all endpoints
+                newEndpoints.forEach(e => {
+                    histories.value[e.label] = [] // Initialize empty history for each endpoint
                 })
-                messages.value = histories.value[selectedEndpoint.value]
+
+                messages.value = histories.value[selectedEndpoint.value] || [] // Set initial messages for selected endpoint
             }
         } catch (err) {
-            console.error('Failed to fetch endpoints from /api/tags:', err)
+            console.error('Failed to fetch endpoints:', err)
         }
     }
 
@@ -63,13 +63,14 @@ export default function useChat() {
                     ? res.data
                     : JSON.stringify(res.data, null, 2)
 
+                // Add system message to history
                 histories.value[endpoint].push({
                     sender: 'System',
                     text: marked(infoText)
                 })
 
                 if (endpoint === selectedEndpoint.value) {
-                    messages.value = [...histories.value[endpoint]]
+                    messages.value = [...histories.value[endpoint]] // Update active messages
                 }
 
                 fetchedInfoEndpoints.add(endpoint)
@@ -83,15 +84,11 @@ export default function useChat() {
         }
     }
 
-    // Watch for endpoint changes
     watch(selectedEndpoint, (newVal) => {
-        messages.value = histories.value[newVal]
-        //fetchEndpointInfo(newVal)
+        console.log('🔁 selectedEndpoint changed to', newVal)
+        // Ensure messages reflect the correct endpoint's history
+        messages.value = histories.value[newVal] || []
     })
-
-    // 🔥 Trigger initial fetch for default endpoint
-    //fetchEndpointInfo(selectedEndpoint.value)
-
 
     const sendMessage = async () => {
         // If already loading, cancel
@@ -100,14 +97,17 @@ export default function useChat() {
             loading.value = false
             return
         }
+
         const message = userInput.value.trim()
         if (!message) return
 
         userInput.value = ' '
         loading.value = true
         controller = new AbortController()
+
         const currentHistory = histories.value[selectedEndpoint.value]
 
+        // Add user message to history
         currentHistory.push({sender: 'You', text: message})
         const aiMessage = {sender: 'AI', text: ''}
         currentHistory.push(aiMessage)
@@ -116,18 +116,21 @@ export default function useChat() {
         formattedMessage.value = ''
 
         scrollToBottom()
-        const selected = endpoints.value.find(e => e.value === selectedEndpoint.value)
+
+        const selected = endpoints.value.find(e => e.label === selectedEndpoint.value)
+        const modelUrl = selected?.value || 'unknown'
         const modelLabel = selected?.label || 'unknown'
 
         try {
             const response = await axios.post(
-                selectedEndpoint.value,
+                modelUrl,
                 {
                     id: id,
                     model: modelLabel,
-                    messages: [
-                        {role: "user", content: message}
-                    ],
+                    messages: histories.value[selectedEndpoint.value].filter(msg => msg.text).map(msg => ({
+                        role: msg.sender === 'You' ? 'user' : (msg.sender === 'AI' ? 'assistant' : msg.sender.toLowerCase()),
+                        content: turndown.turndown(msg.text)
+                    })),
                     stream: true
                 },
                 {
@@ -174,7 +177,7 @@ export default function useChat() {
 
                 scrollToBottom()
             }
-            //tokensPerSecond.value = 0
+
             totalDuration.value = ((performance.now() - startTime) / 1000).toFixed(2)
 
         } catch (err) {

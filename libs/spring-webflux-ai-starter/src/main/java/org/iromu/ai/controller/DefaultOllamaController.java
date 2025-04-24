@@ -4,15 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.iromu.ai.model.ChatRequest;
 import org.iromu.ai.model.ollama.*;
 import org.iromu.ai.service.OllamaService;
+import org.iromu.ai.utils.RequestUtils;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,9 +80,13 @@ public class DefaultOllamaController implements OllamaController {
 
     @Override
     public Flux<ChatStreamResponse> chat(@RequestBody ChatRequest request) {
-        log.trace("Default chat {}", request);
+        log.info("Chat request tokens: {}", request.countTotalTokens());
 
-        return ollamaService.stream(request).map(chatResponse -> {
+        List<Message> messages = RequestUtils.getMessages(request);
+        Optional<ChatOptions> options = RequestUtils.getOptions(request);
+
+        String model = request.model().replace(appName + "/", "");
+        return ollamaService.stream(request, messages, options, model).map(chatResponse -> {
 
             String message = chatResponse.getResult().getOutput().getText();
             Instant createdAt = chatResponse.getMetadata().get("created-at");
@@ -90,7 +96,7 @@ public class DefaultOllamaController implements OllamaController {
             return new ChatStreamResponse.Builder()
                     .model(request.model())
                     .createdAt(createdAt.toString())
-                    .message(new ChatMessage("assistant", message, null))
+                    .message(new ChatMessage(MessageType.ASSISTANT.getValue(), message, null))
                     .done(false)
                     .totalDuration(4883583458L)
                     .loadDuration(1334875L)
@@ -103,36 +109,4 @@ public class DefaultOllamaController implements OllamaController {
 
     }
 
-    public Flux<ChatStreamResponse> chat2(@RequestBody ChatRequest request) {
-        log.info("Default chat {}", request);
-        String lastMessage = request.messages().getLast().content();
-        String modelName = request.model() != null ? request.model() : "gpt-neo:latest";
-
-        // Timestamp for all chunks
-        String createdAt = OffsetDateTime.now().toString();
-
-        Flux<ChatStreamResponse> streaming = Flux.range(0, 3)
-                .delayElements(Duration.ofMillis(200))
-                .map(i -> new ChatStreamResponse.Builder()
-                        .model(modelName)
-                        .createdAt(createdAt)
-                        .message(new ChatMessage("assistant", "chunk " + i, null))
-                        .done(false)
-                        .build());
-
-        ChatStreamResponse doneResponse = new ChatStreamResponse.Builder()
-                .model(modelName)
-                .createdAt(OffsetDateTime.now().toString())
-                .message(new ChatMessage("assistant", "", null))
-                .done(true)
-                .totalDuration(4883583458L)
-                .loadDuration(1334875L)
-                .promptEvalCount(26)
-                .promptEvalDuration(342546000L)
-                .evalCount(282)
-                .evalDuration(4535599000L)
-                .build();
-
-        return streaming.concatWith(Mono.just(doneResponse));
-    }
 }

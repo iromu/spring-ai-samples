@@ -16,3 +16,5 @@ logging:
     root: DEBUG
     sun: INFO
     javax: INFO
+
+spring.profiles.active: local

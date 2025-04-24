@@ -10,3 +10,5 @@ spring:
 openapi:
   urls:
     - "http://localhost:8334/openapi.yaml"
+
+spring.profiles.active: local

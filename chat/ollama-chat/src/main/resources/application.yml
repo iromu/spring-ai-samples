@@ -8,3 +8,5 @@ spring:
           model: llama3.1:8b
 server:
   port: 7770
+
+spring.profiles.active: local

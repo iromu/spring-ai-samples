@@ -26,7 +26,7 @@ class Chatbot {
     private final ChatClient.Builder chatClientBuilder;
 
     Chatbot(ChatModel chatModel, VectorStore vectorStore) {
-        ChatOptions options = OllamaOptions.builder().temperature(0.1).build();
+        ChatOptions options = OllamaOptions.builder().temperature(0.8).build();
         chatClientBuilder = ChatClient.builder(chatModel).defaultOptions(options)
                 .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore));
         this.chatClient = chatClientBuilder.build();

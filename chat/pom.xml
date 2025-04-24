@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>gemini-chat</module>
         <module>ollama-chat</module>
         <module>ollama-chat-advanced</module>
     </modules>

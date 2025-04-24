@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: gemini-chat
+
+server:
+  port: 7776
+
+spring.profiles.active: local

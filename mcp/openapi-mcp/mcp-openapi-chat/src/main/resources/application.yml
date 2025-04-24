@@ -17,4 +17,4 @@ spring:
 server:
   port: 7775
 
-
+spring.profiles.active: local

@@ -1,8 +1,13 @@
 package org.iromu.ai.service;
 
 import org.iromu.ai.model.ChatRequest;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Interface OllamaService defines a contract for handling streaming chat interactions.
@@ -24,5 +29,5 @@ public interface OllamaService {
      *                streaming preferences, system context, and optional parameters for processing the chat interaction.
      * @return a {@code Flux<ChatResponse>} representing a reactive stream of generated chat responses.
      */
-    Flux<ChatResponse> stream(ChatRequest request);
+    Flux<ChatResponse> stream(ChatRequest request, List<Message> messages, Optional<ChatOptions> options, String model);
 }

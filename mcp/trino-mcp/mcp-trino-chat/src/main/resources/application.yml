@@ -21,3 +21,5 @@ server:
 logging:
   level:
     org.springframework.ai.chat.client.advisor: DEBUG
+
+spring.profiles.active: local

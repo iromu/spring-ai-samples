@@ -22,3 +22,5 @@ spring:
 
 server:
   port: 7772
+
+spring.profiles.active: local

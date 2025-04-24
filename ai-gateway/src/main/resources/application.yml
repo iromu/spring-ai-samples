@@ -22,6 +22,7 @@ ai:
     - "http://localhost:7773"
     - "http://localhost:7774"
     - "http://localhost:7775"
+    - "http://localhost:7776"
 
 
 management.endpoint.gateway.enabled: true # default value

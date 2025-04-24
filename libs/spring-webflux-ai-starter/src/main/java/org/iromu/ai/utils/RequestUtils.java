@@ -5,8 +5,11 @@ import org.iromu.ai.model.ChatRequest;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.ChatOptions;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -38,5 +41,41 @@ public class RequestUtils {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    public static Optional<ChatOptions> getOptions(ChatRequest request) {
+        if (request.options() == null || request.options().isEmpty())
+            return Optional.empty();
+        ChatOptions.Builder builder = ChatOptions.builder();
+
+        // Map the values from the options map to the builder
+        Map<String, Object> options = request.options();
+        if (options.containsKey("model")) {
+            builder.model((String) options.get("model"));
+        }
+        if (options.containsKey("frequencyPenalty")) {
+            builder.frequencyPenalty((Double) options.get("frequencyPenalty"));
+        }
+        if (options.containsKey("maxTokens")) {
+            builder.maxTokens((Integer) options.get("maxTokens"));
+        }
+        if (options.containsKey("presencePenalty")) {
+            builder.presencePenalty((Double) options.get("presencePenalty"));
+        }
+        if (options.containsKey("stopSequences")) {
+            builder.stopSequences((List<String>) options.get("stopSequences"));
+        }
+        if (options.containsKey("temperature")) {
+            builder.temperature((Double) options.get("temperature"));
+        }
+        if (options.containsKey("topK")) {
+            builder.topK((Integer) options.get("topK"));
+        }
+        if (options.containsKey("topP")) {
+            builder.topP((Double) options.get("topP"));
+        }
+
+        // Build and return the ChatOptions instance
+        return Optional.of(builder.build());
     }
 }
