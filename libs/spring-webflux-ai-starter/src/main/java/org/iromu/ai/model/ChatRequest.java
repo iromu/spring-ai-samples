@@ -1,5 +1,7 @@
 package org.iromu.ai.model;
 
+import org.iromu.ai.utils.TokenUtils;
+
 import java.util.List;
 import java.util.Map;
 
@@ -36,24 +38,9 @@ public record ChatRequest(
 
         // Iterate through all messages and count tokens
         for (Message message : messages) {
-            totalTokens += countTokens(message.content);
+            totalTokens += TokenUtils.countTokens(message.content);
         }
 
         return totalTokens;
-    }
-
-    /**
-     * Count tokens in the given text by splitting it into words based on whitespace.
-     *
-     * @param text the message content
-     * @return the token count
-     */
-    private int countTokens(String text) {
-        // Simple token count by splitting the content based on whitespace
-        if (text == null || text.isEmpty()) {
-            return 0;
-        }
-        // Split by whitespace and count the number of tokens
-        return text.trim().split("\\s+").length;
     }
 }

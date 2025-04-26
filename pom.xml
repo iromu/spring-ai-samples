@@ -43,7 +43,26 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
     <repositories>
         <repository>
             <id>spring-milestones</id>
@@ -55,4 +74,55 @@
         </repository>
     </repositories>
 
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <goals>
+                                        <goal>build-info</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <classifier>exec</classifier>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.graalvm.buildtools</groupId>
+                            <artifactId>native-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>build-image</id>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>compile-no-fork</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <skipNativeTests>true</skipNativeTests>
+                                <buildArgs>
+                                    <buildArg>--verbose</buildArg>
+                                    <buildArg>-Ob</buildArg>
+                                    <buildArg>-J-Xmx6G</buildArg>
+                                    <buildArg>-H:+UnlockExperimentalVMOptions</buildArg>
+                                    <buildArg>-R:MaxHeapSize=64m</buildArg>
+                                    <buildArg>-H:IncludeResources='.*\.so$'</buildArg>
+                                    <buildArg>-H:IncludeResources='.*\.keys$'</buildArg>
+                                    <buildArg>-H:Log=registerResource:1</buildArg>
+                                </buildArgs>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 </project>

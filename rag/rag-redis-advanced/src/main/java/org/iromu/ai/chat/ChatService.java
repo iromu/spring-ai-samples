@@ -23,7 +23,6 @@ class ChatService implements OllamaService {
         this.chatbot = chatbot;
     }
 
-
     public Flux<ChatResponse> stream(ChatRequest request, List<Message> messages, Optional<ChatOptions> options, String model) {
         return chatbot.stream("1", messages);
     }

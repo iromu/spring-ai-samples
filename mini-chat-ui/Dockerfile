@@ -12,4 +12,4 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # ENV can be overridden at runtime
-ENV VITE_BACKENDS="[]"
+ENV VITE_OLLAMA="[]"

@@ -1,12 +1,14 @@
 package org.iromu.ai.chat;
 
 import lombok.extern.slf4j.Slf4j;
+import org.iromu.ai.utils.TokenUtils;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -23,19 +25,30 @@ import java.util.stream.Collectors;
 class Chatbot {
 
     private static final String SYSTEM_PROMPT_TEMPLATE = """
+            ### Task:
+                   Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id="1">).
             
-            You're assisting with questions about services offered by Carina, when asked who you are.
-            Carina is a two-sided healthcare marketplace focusing on home care aides (caregivers)
-            and their Medicaid in-home care clients (adults and children with developmental disabilities and low income elderly population).
-            Carina's mission is to build online tools to bring good jobs to care workers, so care workers can provide the
-            best possible care for those who need it.
+                   ### Guidelines:
+                   - If you don't know the answer, clearly state that.
+                   - If uncertain, ask the user for clarification.
+                   - Respond in the same language as the user's query.
+                   - If the context is unreadable or of poor quality, inform the user and provide the best possible answer.
+                   - If the answer isn't present in the context but you possess the knowledge, explain this to the user and provide the answer using your own understanding.
+                   - **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**
+                   - Do not cite if the <source> tag does not contain an id attribute.
+                   - Do not use XML tags in your response.
+                   - Ensure citations are concise and directly related to the information provided.
             
-            Use the information from the DOCUMENTS section to provide accurate answers but act as if you knew this information innately.
-            If unsure, simply state that you don't know.
+                   ### Example of Citation:
+                   If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:
+                   * "According to the study, the proposed method increases efficiency by 20% [1]."
             
-            DOCUMENTS:
-            {documents}
+                   ### Output:
+                   Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context.
             
+                   <context>
+                   {question_answer_context}
+                   </context>
             """;
     private final ChatModel chatModel;
     private final VectorStore vectorStore;
@@ -56,12 +69,15 @@ class Chatbot {
             log.info("Retrieved {} documents from vectorstore", listOfSimilarDocuments.size());
             var documents = listOfSimilarDocuments
                     .stream()
-                    .map(Document::getText)
+                    .map(document -> document.getFormattedContent(MetadataMode.INFERENCE))
                     .collect(Collectors.joining(System.lineSeparator()));
-            log.info("The documents context has {} chars", documents.length());
+
+            log.info("Context tokens: {}", TokenUtils.countTokens(documents));
+
             var systemMessage = new SystemPromptTemplate(SYSTEM_PROMPT_TEMPLATE)
-                    .createMessage(Map.of("documents", documents));
-            log.info("The System prompt has {} chars", systemMessage.getText().length());
+                    .createMessage(Map.of("question_answer_context", documents));
+
+            log.info("System prompt tokens: {}", TokenUtils.countTokens(systemMessage.getText()));
 
 
             List<Message> messageList = new ArrayList<>();

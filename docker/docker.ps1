@@ -7,9 +7,10 @@ Set-Location (get-item $PSScriptRoot).parent.FullName
 Import-Module ./docker/docker_lib.psm1
 
 dockerBuildNodeWorkspace 'mini-chat-ui' 'mini-chat-ui'
+dockerBuildNative 'ai-gateway' 'ai-gateway'
 
 $sw.Stop()
 
-echo "NODE FINISHED"
+echo "DOCKER FINISHED"
 $sw.Elapsed
 
