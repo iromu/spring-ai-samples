@@ -2,6 +2,7 @@ package org.iromu.ai.mcp;
 
 import io.swagger.v3.oas.models.Operation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.util.ToolUtils;
@@ -51,4 +52,8 @@ public class OpenAPIToolCallback implements ToolCallback {
 		return toolExecutionService.executeTool(operation.getOperationId(), inputParams).block();
 	}
 
+	@Override
+	public String call(String toolInput, ToolContext tooContext) {
+		return call(toolInput);
+	}
 }
