@@ -39,86 +39,81 @@ import java.util.Map;
 @Slf4j
 public class TrinoSchemaService {
 
-    private final JdbcTemplate jdbcTemplate;
+	private final JdbcTemplate jdbcTemplate;
 
-    public TrinoSchemaService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+	public TrinoSchemaService(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
-    /**
-     * Retrieves all available catalogs from Trino, optionally using a cached version.
-     *
-     * @return a list of catalog names
-     */
-    @SneakyThrows
-    @Tool(description = "Get catalogs")
-    public List<String> getCatalogs() {
-        log.info("SHOW CATALOGS");
-        return jdbcTemplate.queryForList("SHOW CATALOGS", String.class);
-    }
+	/**
+	 * Retrieves all available catalogs from Trino, optionally using a cached version.
+	 * @return a list of catalog names
+	 */
+	@SneakyThrows
+	@Tool(description = "Get catalogs")
+	public List<String> getCatalogs() {
+		log.info("SHOW CATALOGS");
+		return jdbcTemplate.queryForList("SHOW CATALOGS", String.class);
+	}
 
-    /**
-     * Retrieves all schemas for a given catalog, optionally using a cached version.
-     *
-     * @param _catalog the sanitized catalog name
-     * @return a list of schema names
-     */
-    @SneakyThrows
-    @Tool(description = "Get schemas for a catalog. Input is a catalog")
-    public List<String> getSchemas(String _catalog) {
-        log.info("SHOW SCHEMAS FROM {}", _catalog);
-        try {
-            return jdbcTemplate
-                    .queryForList("SHOW SCHEMAS FROM " + _catalog, String.class);
-        } catch (Exception e) {
-            log.error("{} {}", _catalog, e.getMessage());
-            return new ArrayList<>();
-        }
-    }
+	/**
+	 * Retrieves all schemas for a given catalog, optionally using a cached version.
+	 * @param _catalog the sanitized catalog name
+	 * @return a list of schema names
+	 */
+	@SneakyThrows
+	@Tool(description = "Get schemas for a catalog. Input is a catalog")
+	public List<String> getSchemas(String _catalog) {
+		log.info("SHOW SCHEMAS FROM {}", _catalog);
+		try {
+			return jdbcTemplate.queryForList("SHOW SCHEMAS FROM " + _catalog, String.class);
+		}
+		catch (Exception e) {
+			log.error("{} {}", _catalog, e.getMessage());
+			return new ArrayList<>();
+		}
+	}
 
-    /**
-     * Retrieves all tables for a given catalog and schema, optionally using a cached
-     * version.
-     *
-     * @param _catalog the sanitized catalog name
-     * @param _schema  the sanitized schema name
-     * @return a list of table names
-     */
-    @SneakyThrows
-    @Tool(description = "Get tables for a specific catalog/schema")
-    public List<String> getTables(String _catalog, String _schema) {
-        log.info("SHOW TABLES FROM {}.{}", _catalog, _schema);
-        try {
+	/**
+	 * Retrieves all tables for a given catalog and schema, optionally using a cached
+	 * version.
+	 * @param _catalog the sanitized catalog name
+	 * @param _schema the sanitized schema name
+	 * @return a list of table names
+	 */
+	@SneakyThrows
+	@Tool(description = "Get tables for a specific catalog/schema")
+	public List<String> getTables(String _catalog, String _schema) {
+		log.info("SHOW TABLES FROM {}.{}", _catalog, _schema);
+		try {
 
-            return jdbcTemplate.queryForList("SHOW TABLES FROM " + _catalog
-                    + "." + _schema, String.class);
-        } catch (Exception e) {
-            log.error("{}.{} {}", _catalog, _schema, e.getMessage());
-            return new ArrayList<>();
-        }
-    }
+			return jdbcTemplate.queryForList("SHOW TABLES FROM " + _catalog + "." + _schema, String.class);
+		}
+		catch (Exception e) {
+			log.error("{}.{} {}", _catalog, _schema, e.getMessage());
+			return new ArrayList<>();
+		}
+	}
 
-    /**
-     * Retrieves column metadata for a specific table, optionally using a cached version.
-     *
-     * @param _catalog the sanitized catalog name
-     * @param _schema  the sanitized schema name
-     * @param _table   the sanitized table name
-     * @return a list of maps, each representing a column's metadata
-     */
-    @SneakyThrows
-    @Tool(description = "Get columns for a specific catalog/schema/table")
-    public List<Map<String, Object>> getColumns(String _catalog, String _schema, String _table) {
-        log.info("DESCRIBE {}.{}.{}", _catalog, _schema, _table);
-        try {
+	/**
+	 * Retrieves column metadata for a specific table, optionally using a cached version.
+	 * @param _catalog the sanitized catalog name
+	 * @param _schema the sanitized schema name
+	 * @param _table the sanitized table name
+	 * @return a list of maps, each representing a column's metadata
+	 */
+	@SneakyThrows
+	@Tool(description = "Get columns for a specific catalog/schema/table")
+	public List<Map<String, Object>> getColumns(String _catalog, String _schema, String _table) {
+		log.info("DESCRIBE {}.{}.{}", _catalog, _schema, _table);
+		try {
 
-            return jdbcTemplate
-                    .queryForList("DESCRIBE " + (_catalog) + "."
-                            + (_schema) + "." + (_table));
-        } catch (Exception e) {
-            log.error("{}.{}.{} {}", _catalog, _schema, _table, e.getMessage());
-            return new ArrayList<>();
-        }
-    }
+			return jdbcTemplate.queryForList("DESCRIBE " + (_catalog) + "." + (_schema) + "." + (_table));
+		}
+		catch (Exception e) {
+			log.error("{}.{}.{} {}", _catalog, _schema, _table, e.getMessage());
+			return new ArrayList<>();
+		}
+	}
 
 }

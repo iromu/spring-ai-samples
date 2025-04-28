@@ -12,42 +12,43 @@ import java.util.Map;
 
 @Slf4j
 public class OpenAPIToolCallback implements ToolCallback {
-    private final ToolExecutionService toolExecutionService;
-    private final ToolDefinition toolDefinition;
-    private final Operation operation;
 
-    public OpenAPIToolCallback(ToolExecutionService toolExecutionService, String baseUrl, String path, Operation operation) {
-        this.toolExecutionService = toolExecutionService;
-        this.operation = operation;
-        var name = operation.getOperationId();
-        var description = operation.getDescription();
-        var inputSchema = JsonSchemaGeneratorOpenAPI.generateForOperation(operation);
+	private final ToolExecutionService toolExecutionService;
 
-        String description1 = null;
+	private final ToolDefinition toolDefinition;
 
-        if (StringUtils.hasText(operation.getDescription())) {
-            description1 = operation.getDescription();
-        } else if (StringUtils.hasText(operation.getSummary())) {
-            description1 = ToolUtils.getToolDescriptionFromName(operation.getSummary());
-        }
+	private final Operation operation;
 
-        toolDefinition = ToolDefinition.builder()
-                .name(name)
-                .description(
-                        description1)
-                .inputSchema(inputSchema)
-                .build();
-    }
+	public OpenAPIToolCallback(ToolExecutionService toolExecutionService, String baseUrl, String path,
+			Operation operation) {
+		this.toolExecutionService = toolExecutionService;
+		this.operation = operation;
+		var name = operation.getOperationId();
+		var description = operation.getDescription();
+		var inputSchema = JsonSchemaGeneratorOpenAPI.generateForOperation(operation);
 
-    @Override
-    public ToolDefinition getToolDefinition() {
-        return toolDefinition;
-    }
+		String description1 = null;
 
-    @Override
-    public String call(String toolInput) {
-        log.info(toolInput);
-        Map<String, Object> inputParams = JsonParser.<Map<String, Object>>fromJson(toolInput, Map.class);
-        return toolExecutionService.executeTool(operation.getOperationId(), inputParams).block();
-    }
+		if (StringUtils.hasText(operation.getDescription())) {
+			description1 = operation.getDescription();
+		}
+		else if (StringUtils.hasText(operation.getSummary())) {
+			description1 = ToolUtils.getToolDescriptionFromName(operation.getSummary());
+		}
+
+		toolDefinition = ToolDefinition.builder().name(name).description(description1).inputSchema(inputSchema).build();
+	}
+
+	@Override
+	public ToolDefinition getToolDefinition() {
+		return toolDefinition;
+	}
+
+	@Override
+	public String call(String toolInput) {
+		log.info(toolInput);
+		Map<String, Object> inputParams = JsonParser.<Map<String, Object>>fromJson(toolInput, Map.class);
+		return toolExecutionService.executeTool(operation.getOperationId(), inputParams).block();
+	}
+
 }

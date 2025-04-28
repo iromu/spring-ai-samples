@@ -1,0 +1,6 @@
+server:
+  port: 11082
+
+spring:
+  application:
+    name: product-openapi

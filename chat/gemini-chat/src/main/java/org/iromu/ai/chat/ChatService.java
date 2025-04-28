@@ -18,15 +18,16 @@ import java.util.Optional;
 @Slf4j
 class ChatService implements OllamaService {
 
-    private final ChatModel chatModel;
+	private final ChatModel chatModel;
 
-    public ChatService(ChatModel chatModel) {
-        this.chatModel = chatModel;
-    }
+	public ChatService(ChatModel chatModel) {
+		this.chatModel = chatModel;
+	}
 
-    public Flux<ChatResponse> stream(ChatRequest request, List<Message> messages, Optional<ChatOptions> options, String model) {
-        Prompt prompt = new Prompt(messages);
-        return chatModel.stream(prompt);
-    }
+	public Flux<ChatResponse> stream(ChatRequest request, List<Message> messages, Optional<ChatOptions> options,
+			String model) {
+		Prompt prompt = new Prompt(messages);
+		return chatModel.stream(prompt);
+	}
 
 }

@@ -20,39 +20,41 @@ import java.util.Optional;
 @Component
 @Slf4j
 class Chatbot {
-    private final ChatClient chatClient;
-    private final ChatClient.Builder chatClientBuilder;
 
-    Chatbot(ChatModel chatModel) {
-        ChatOptions options = ChatOptions.builder().temperature(0.8).build();
-        chatClientBuilder = ChatClient.builder(chatModel).defaultOptions(options);
-        this.chatClient = chatClientBuilder.build();
-    }
+	private final ChatClient chatClient;
 
-    public Flux<ChatResponse> stream(String id, List<Message> messages, Optional<ChatOptions> options) {
+	private final ChatClient.Builder chatClientBuilder;
 
+	Chatbot(ChatModel chatModel) {
+		ChatOptions options = ChatOptions.builder().temperature(0.8).build();
+		chatClientBuilder = ChatClient.builder(chatModel).defaultOptions(options);
+		this.chatClient = chatClientBuilder.build();
+	}
 
-        Query query = Query.builder()
-                .text(messages.getLast().getText())
-                .history(messages.subList(Math.max(messages.size() - 5, 0), messages.size()))
-                .build();
+	public Flux<ChatResponse> stream(String id, List<Message> messages, Optional<ChatOptions> options) {
 
-        QueryTransformer queryTransformer = CompressionQueryTransformer.builder()
-                .chatClientBuilder(chatClientBuilder)
-                .build();
+		Query query = Query.builder()
+			.text(messages.getLast().getText())
+			.history(messages.subList(Math.max(messages.size() - 5, 0), messages.size()))
+			.build();
 
-        Mono<Query> queryMono = Mono.fromCallable(() -> {
-            // Blocking call here
-            return queryTransformer.transform(query);
-        }).subscribeOn(Schedulers.boundedElastic());
+		QueryTransformer queryTransformer = CompressionQueryTransformer.builder()
+			.chatClientBuilder(chatClientBuilder)
+			.build();
 
-        return queryMono.flatMapMany(transformedQuery -> {
-            log.info("CompressionQueryTransformer: {}", transformedQuery.text());
-            ChatClient.ChatClientRequestSpec spec = chatClient.prompt(transformedQuery.text());
-            if (options.isPresent()) {
-                spec.options(options.get());
-            }
-            return spec.stream().chatResponse();
-        });
-    }
+		Mono<Query> queryMono = Mono.fromCallable(() -> {
+			// Blocking call here
+			return queryTransformer.transform(query);
+		}).subscribeOn(Schedulers.boundedElastic());
+
+		return queryMono.flatMapMany(transformedQuery -> {
+			log.info("CompressionQueryTransformer: {}", transformedQuery.text());
+			ChatClient.ChatClientRequestSpec spec = chatClient.prompt(transformedQuery.text());
+			if (options.isPresent()) {
+				spec.options(options.get());
+			}
+			return spec.stream().chatResponse();
+		});
+	}
+
 }

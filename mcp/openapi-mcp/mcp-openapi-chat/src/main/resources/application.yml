@@ -11,8 +11,10 @@ spring:
         type: async
         sse:
           connections:
-            mcp-server-petstore:
-              url: http://localhost:7002
+            #            mcp-server-petstore:
+            #              url: http://localhost:7002
+            mcp-server-samples:
+              url: http://localhost:7003
 
 server:
   port: 7775

@@ -15,24 +15,19 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfig {
 
-    @Bean
-    public WebClientCustomizer webClientCustomizer(WebClientProperties props) {
-        return builder -> {
-            TcpClient tcpClient = TcpClient.create()
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
-                            (int) props.getConnectTimeout().toMillis())
-                    .doOnConnected(conn ->
-                            conn.addHandlerLast(new ReadTimeoutHandler(
-                                            props.getReadTimeout().getSeconds(), TimeUnit.SECONDS))
-                                    .addHandlerLast(new WriteTimeoutHandler(
-                                            props.getWriteTimeout().getSeconds(), TimeUnit.SECONDS))
-                    );
+	@Bean
+	public WebClientCustomizer webClientCustomizer(WebClientProperties props) {
+		return builder -> {
+			TcpClient tcpClient = TcpClient.create()
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) props.getConnectTimeout().toMillis())
+				.doOnConnected(conn -> conn
+					.addHandlerLast(new ReadTimeoutHandler(props.getReadTimeout().getSeconds(), TimeUnit.SECONDS))
+					.addHandlerLast(new WriteTimeoutHandler(props.getWriteTimeout().getSeconds(), TimeUnit.SECONDS)));
 
-            HttpClient httpClient = HttpClient.from(tcpClient)
-                    .responseTimeout(props.getResponseTimeout());
+			HttpClient httpClient = HttpClient.from(tcpClient).responseTimeout(props.getResponseTimeout());
 
-            builder.clientConnector(new ReactorClientHttpConnector(httpClient));
-        };
-    }
+			builder.clientConnector(new ReactorClientHttpConnector(httpClient));
+		};
+	}
 
 }

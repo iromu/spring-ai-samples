@@ -19,64 +19,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The OllamaGatewayController class acts as a REST controller that handles API requests and
- * communicates with the TagDiscoveryService to manage operations related to tags and chats.
- * This controller provides endpoints for retrieving tags and performing chat operations.
+ * The OllamaGatewayController class acts as a REST controller that handles API requests
+ * and communicates with the TagDiscoveryService to manage operations related to tags and
+ * chats. This controller provides endpoints for retrieving tags and performing chat
+ * operations.
  *
  * An implementation of the OllamaController interface, it uses a WebClient.Builder for
- * constructing HTTP requests and integrates with TagDiscoveryService for discovering tags.
+ * constructing HTTP requests and integrates with TagDiscoveryService for discovering
+ * tags.
  */
 @RestController
 @Slf4j
 @CrossOrigin(origins = "*")
-@RequestMapping({"/api"})
+@RequestMapping({ "/api" })
 public class OllamaGatewayController implements OllamaController {
 
-    private final WebClient.Builder webClientBuilder;
+	private final WebClient.Builder webClientBuilder;
 
-    private final TagDiscoveryService tagDiscoveryService;
+	private final TagDiscoveryService tagDiscoveryService;
 
-    public OllamaGatewayController(WebClient.Builder webClientBuilder,
-                                   TagDiscoveryService tagDiscoveryService) {
-        this.webClientBuilder = webClientBuilder;
-        this.tagDiscoveryService = tagDiscoveryService;
-    }
+	public OllamaGatewayController(WebClient.Builder webClientBuilder, TagDiscoveryService tagDiscoveryService) {
+		this.webClientBuilder = webClientBuilder;
+		this.tagDiscoveryService = tagDiscoveryService;
+	}
 
+	private TagsResponse aggregateResponses(List<TagDiscoveryService.MetaTagResponse> responses) {
+		List<ModelTag> models = new ArrayList<>();
+		for (TagDiscoveryService.MetaTagResponse response : responses) {
+			if (response != null && response.tagsResponse().models() != null)
+				models.addAll(response.tagsResponse().models());
+		}
+		log.info("models {}", models);
+		return new TagsResponse(models);
+	}
 
-    private TagsResponse aggregateResponses(List<TagDiscoveryService.MetaTagResponse> responses) {
-        List<ModelTag> models = new ArrayList<>();
-        for (TagDiscoveryService.MetaTagResponse response : responses) {
-            if (response != null && response.tagsResponse().models() != null)
-                models.addAll(response.tagsResponse().models());
-        }
-        log.info("models {}", models);
-        return new TagsResponse(models);
-    }
+	public Mono<TagsResponse> getTags() {
+		return this.tagDiscoveryService.getTags()
+			.collectList()
+			.map(this::aggregateResponses)
+			.doOnNext(o -> log.debug("{}", o));
+	}
 
-    public Mono<TagsResponse> getTags() {
-        return this.tagDiscoveryService.getTags().collectList()
-                .map(this::aggregateResponses)
-                .doOnNext(o -> log.debug("{}", o));
-    }
+	public Flux<ChatStreamResponse> chat(@RequestBody ChatRequest request) {
+		log.info("{}", request);
+		ModelTag modelName = new ModelTag(request.model(), null);
 
-    public Flux<ChatStreamResponse> chat(@RequestBody ChatRequest request) {
-        log.info("{}", request);
-        ModelTag modelName = new ModelTag(request.model(), null);
+		return this.tagDiscoveryService.getTags()
+			.filter(t -> t != null && t.tagsResponse().models() != null
+					&& t.tagsResponse().models().contains(modelName))
+			.flatMap(o -> {
+				log.info("{}/api/chat", o.url());
+				return webClientBuilder.baseUrl(o.url())
+					.build()
+					.post()
+					.uri("/api/chat")
+					.bodyValue(request)
+					.accept(MediaType.APPLICATION_NDJSON)
+					.exchangeToFlux(response -> response.bodyToFlux(ChatStreamResponse.class));
+			}
 
-        return this.tagDiscoveryService.getTags()
-                .filter(t -> t != null && t.tagsResponse().models() != null && t.tagsResponse().models().contains(modelName))
-                .flatMap(o -> {
-                            log.info("{}/api/chat", o.url());
-                            return webClientBuilder.baseUrl(o.url()).build()
-                                    .post()
-                                    .uri("/api/chat")
-                                    .bodyValue(request)
-                                    .accept(MediaType.APPLICATION_NDJSON)
-                                    .exchangeToFlux(response -> response.bodyToFlux(ChatStreamResponse.class));
-                        }
+			);
 
-                );
-
-    }
+	}
 
 }

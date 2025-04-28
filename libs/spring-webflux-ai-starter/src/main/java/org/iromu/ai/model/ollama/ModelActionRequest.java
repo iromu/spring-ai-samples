@@ -5,11 +5,8 @@ package org.iromu.ai.model.ollama;
  *
  * This record contains the following fields:
  *
- * - model: The identifier of the model on which the action will be performed.
- * - name: The name of the action to be executed.
+ * - model: The identifier of the model on which the action will be performed. - name: The
+ * name of the action to be executed.
  */
-public record ModelActionRequest(
-        String model,
-        String name
-) {
+public record ModelActionRequest(String model, String name) {
 }

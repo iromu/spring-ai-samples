@@ -8,9 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Slf4j
 public class McpServerPetstoreApp {
 
-    public static void main(String[] args) {
-        SpringApplication.run(McpServerPetstoreApp.class, args);
-    }
-
+	public static void main(String[] args) {
+		SpringApplication.run(McpServerPetstoreApp.class, args);
+	}
 
 }

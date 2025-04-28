@@ -10,57 +10,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonSchemaGeneratorOpenAPI {
-    // Get inspiration from https://github.com/spring-projects/spring-ai/blob/83294023cd4946c46b42df01b686bcc70418ea70/spring-ai-core/src/main/java/org/springframework/ai/util/json/schema/JsonSchemaGenerator.java#L119
 
-    /**
-     * Generate a JSON Schema for an Operation parameters.
-     */
-    public static String generateForOperation(Operation operation) {
-        ObjectNode schema = JsonParser.getObjectMapper().createObjectNode();
-        schema.put("$schema", SchemaVersion.DRAFT_2020_12.getIdentifier());
-        schema.put("type", "object");
+	// Get inspiration from
+	// https://github.com/spring-projects/spring-ai/blob/83294023cd4946c46b42df01b686bcc70418ea70/spring-ai-core/src/main/java/org/springframework/ai/util/json/schema/JsonSchemaGenerator.java#L119
 
-        ObjectNode properties = schema.putObject("properties");
-        List<String> required = new ArrayList<>();
+	/**
+	 * Generate a JSON Schema for an Operation parameters.
+	 */
+	public static String generateForOperation(Operation operation) {
+		ObjectNode schema = JsonParser.getObjectMapper().createObjectNode();
+		schema.put("$schema", SchemaVersion.DRAFT_2020_12.getIdentifier());
+		schema.put("type", "object");
 
-        if (operation.getParameters() != null) {
-            operation.getParameters().forEach(parameter -> {
-                String parameterName = parameter.getName();
-                ObjectNode parameterNode = JsonParser.getObjectMapper().createObjectNode();
-                parameterNode.put("type", determineParameterType(parameter));
-                parameterNode.put("description", getParameterDescription(parameter));
-                properties.set(parameterName, parameterNode);
-                if (parameter.getRequired()) {
-                    required.add(parameterName);
-                }
-            });
-        }
+		ObjectNode properties = schema.putObject("properties");
+		List<String> required = new ArrayList<>();
 
-        var requiredArray = schema.putArray("required");
-        required.forEach(requiredArray::add);
+		if (operation.getParameters() != null) {
+			operation.getParameters().forEach(parameter -> {
+				String parameterName = parameter.getName();
+				ObjectNode parameterNode = JsonParser.getObjectMapper().createObjectNode();
+				parameterNode.put("type", determineParameterType(parameter));
+				parameterNode.put("description", getParameterDescription(parameter));
+				properties.set(parameterName, parameterNode);
+				if (parameter.getRequired()) {
+					required.add(parameterName);
+				}
+			});
+		}
 
-        return schema.toPrettyString();
-    }
+		var requiredArray = schema.putArray("required");
+		required.forEach(requiredArray::add);
 
-    private static String getParameterDescription(Parameter parameter) {
-        String description1 = parameter.getDescription();
-        if (description1 == null) {
-            description1 = parameter.getName();
-        }
-        StringBuilder description = new StringBuilder(description1);
-        if (parameter.getExample() != null) {
-            description.append(String.format(" e.g. %s", parameter.getExample().toString()));
-        }
+		return schema.toPrettyString();
+	}
 
-        return description.toString();
-    }
+	private static String getParameterDescription(Parameter parameter) {
+		String description1 = parameter.getDescription();
+		if (description1 == null) {
+			description1 = parameter.getName();
+		}
+		StringBuilder description = new StringBuilder(description1);
+		if (parameter.getExample() != null) {
+			description.append(String.format(" e.g. %s", parameter.getExample().toString()));
+		}
 
-    private static String determineParameterType(Parameter parameter) {
-        if (parameter.getSchema().getType() != null) {
-            return parameter.getSchema().getType();
-        }
+		return description.toString();
+	}
 
-        var types = parameter.getSchema().getTypes();
-        return types.toArray()[0].toString();
-    }
+	private static String determineParameterType(Parameter parameter) {
+		if (parameter.getSchema().getType() != null) {
+			return parameter.getSchema().getType();
+		}
+
+		var types = parameter.getSchema().getTypes();
+		return types.toArray()[0].toString();
+	}
+
 }

@@ -21,32 +21,30 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @Slf4j
 class Chatbot {
 
-    private final ChatClient chatClient;
+	private final ChatClient chatClient;
 
-    Chatbot(ChatModel chatModel, List<McpAsyncClient> mcpClients) {
-        for (McpAsyncClient mcpClient : mcpClients) {
-            log.info("Registering MCP Client {} v{}, Server {} v{}",
-                    mcpClient.getClientInfo().name(),
-                    mcpClient.getClientInfo().version(),
-                    mcpClient.getServerInfo().name(),
-                    mcpClient.getServerInfo().version()
-            );
-        }
+	Chatbot(ChatModel chatModel, List<McpAsyncClient> mcpClients) {
+		for (McpAsyncClient mcpClient : mcpClients) {
+			log.info("Registering MCP Client {} v{}, Server {} v{}", mcpClient.getClientInfo().name(),
+					mcpClient.getClientInfo().version(), mcpClient.getServerInfo().name(),
+					mcpClient.getServerInfo().version());
+		}
 
-        var mcpToolProvider = new AsyncMcpToolCallbackProvider(mcpClients);
-        MessageChatMemoryAdvisor memoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
-        SimpleLoggerAdvisor simpleLoggerAdvisor = new SimpleLoggerAdvisor();
-        ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
-                .defaultTools(mcpToolProvider)
-                .defaultAdvisors(memoryAdvisor, simpleLoggerAdvisor);
-        this.chatClient = chatClientBuilder.build();
-        log.info("Chatbot built");
-    }
+		var mcpToolProvider = new AsyncMcpToolCallbackProvider(mcpClients);
+		MessageChatMemoryAdvisor memoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
+		SimpleLoggerAdvisor simpleLoggerAdvisor = new SimpleLoggerAdvisor();
+		ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
+			.defaultTools(mcpToolProvider)
+			.defaultAdvisors(memoryAdvisor, simpleLoggerAdvisor);
+		this.chatClient = chatClientBuilder.build();
+		log.info("Chatbot built");
+	}
 
-    public Flux<ChatResponse> stream(String id, List<Message> messages) {
-        return chatClient.prompt(messages.getLast().getText())
-                .advisors(advisorSpec -> advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id))
-                .stream().chatResponse();
-    }
+	public Flux<ChatResponse> stream(String id, List<Message> messages) {
+		return chatClient.prompt(messages.getLast().getText())
+			.advisors(advisorSpec -> advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id))
+			.stream()
+			.chatResponse();
+	}
 
 }

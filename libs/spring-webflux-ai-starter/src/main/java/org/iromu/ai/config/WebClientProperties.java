@@ -10,8 +10,13 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "webclient")
 @Data
 public class WebClientProperties {
-    private Duration connectTimeout = Duration.ofSeconds(10);
-    private Duration readTimeout = Duration.ofSeconds(10);
-    private Duration writeTimeout = Duration.ofSeconds(10);
-    private Duration responseTimeout = Duration.ofSeconds(10);
+
+	private Duration connectTimeout = Duration.ofSeconds(10);
+
+	private Duration readTimeout = Duration.ofSeconds(10);
+
+	private Duration writeTimeout = Duration.ofSeconds(10);
+
+	private Duration responseTimeout = Duration.ofSeconds(10);
+
 }

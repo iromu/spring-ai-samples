@@ -24,63 +24,61 @@ import java.util.List;
  * This service is initialized with a discovery loop that runs at a fixed interval,
  * polling the configured endpoints to retrieve metadata tags.
  *
- * Core responsibilities:
- * - Fetch metadata tags from external services at regular intervals.
- * - Provide real-time access to discovered tags via a reactive stream.
- * - Handle errors gracefully and return default responses when remote services fail.
+ * Core responsibilities: - Fetch metadata tags from external services at regular
+ * intervals. - Provide real-time access to discovered tags via a reactive stream. -
+ * Handle errors gracefully and return default responses when remote services fail.
  *
- * Dependencies:
- * - Spring's {@link WebClient.Builder} for making HTTP requests.
- * - {@link AiConfig} to retrieve a list of target URLs for tag discovery.
+ * Dependencies: - Spring's {@link WebClient.Builder} for making HTTP requests. -
+ * {@link AiConfig} to retrieve a list of target URLs for tag discovery.
  *
- * Key Methods:
- * - {@code startDiscoveryLoop}: Initializes the discovery loop that executes at fixed intervals.
- * - {@code discoverOnce}: Performs a one-time fetch of metadata tags from all configured URLs.
+ * Key Methods: - {@code startDiscoveryLoop}: Initializes the discovery loop that executes
+ * at fixed intervals. - {@code discoverOnce}: Performs a one-time fetch of metadata tags
+ * from all configured URLs.
  *
- * Records:
- * - {@code MetaTagResponse}: Represents a response containing metadata tags retrieved
- *   from a specific URL along with the associated response details.
+ * Records: - {@code MetaTagResponse}: Represents a response containing metadata tags
+ * retrieved from a specific URL along with the associated response details.
  */
 @Service
 @Slf4j
 public class TagDiscoveryService {
 
-    private final List<String> urls;
-    private final WebClient.Builder webClientBuilder;
+	private final List<String> urls;
 
-    @Getter
-    private Flux<MetaTagResponse> tags;
+	private final WebClient.Builder webClientBuilder;
 
-    public TagDiscoveryService(AiConfig aiConfig, WebClient.Builder webClientBuilder) {
-        this.urls = aiConfig.getUrls();
-        this.webClientBuilder = webClientBuilder;
-    }
+	@Getter
+	private Flux<MetaTagResponse> tags;
 
-    @PostConstruct
-    public void startDiscoveryLoop() {
-        Flux.interval(Duration.ZERO, Duration.ofSeconds(10))
-                .flatMap(tick -> discoverOnce())
-                .subscribeOn(Schedulers.boundedElastic())
-                .subscribe();
-    }
+	public TagDiscoveryService(AiConfig aiConfig, WebClient.Builder webClientBuilder) {
+		this.urls = aiConfig.getUrls();
+		this.webClientBuilder = webClientBuilder;
+	}
 
-    private Flux<MetaTagResponse> discoverOnce() {
-        this.tags = Flux.fromIterable(urls)
-                .flatMap(url -> {
-                    log.debug("Discovering tags from {}/api/tags", url);
-                    return webClientBuilder.baseUrl(url).build()
-                            .get()
-                            .uri("/api/tags")
-                            .accept(MediaType.APPLICATION_JSON)
-                            .exchangeToMono(response -> response.bodyToMono(TagsResponse.class))
-                            .onErrorReturn(new TagsResponse(new ArrayList<>()))
-                            .map(tagsResponse -> new MetaTagResponse(url, tagsResponse));
-                })
-                .cache();
+	@PostConstruct
+	public void startDiscoveryLoop() {
+		Flux.interval(Duration.ZERO, Duration.ofSeconds(10))
+			.flatMap(tick -> discoverOnce())
+			.subscribeOn(Schedulers.boundedElastic())
+			.subscribe();
+	}
 
-        return this.tags;
-    }
+	private Flux<MetaTagResponse> discoverOnce() {
+		this.tags = Flux.fromIterable(urls).flatMap(url -> {
+			log.debug("Discovering tags from {}/api/tags", url);
+			return webClientBuilder.baseUrl(url)
+				.build()
+				.get()
+				.uri("/api/tags")
+				.accept(MediaType.APPLICATION_JSON)
+				.exchangeToMono(response -> response.bodyToMono(TagsResponse.class))
+				.onErrorReturn(new TagsResponse(new ArrayList<>()))
+				.map(tagsResponse -> new MetaTagResponse(url, tagsResponse));
+		}).cache();
 
-    public record MetaTagResponse(String url, TagsResponse tagsResponse) {
-    }
+		return this.tags;
+	}
+
+	public record MetaTagResponse(String url, TagsResponse tagsResponse) {
+	}
+
 }

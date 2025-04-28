@@ -17,16 +17,15 @@ import java.util.Optional;
 @Slf4j
 class ChatService implements OllamaService {
 
+	private final Chatbot chatbot;
 
-    private final Chatbot chatbot;
+	ChatService(Chatbot chatbot, @Value("${spring.ai.ollama.chat.options.model}") String model) {
+		this.chatbot = chatbot;
+	}
 
-    ChatService(Chatbot chatbot, @Value("${spring.ai.ollama.chat.options.model}") String model) {
-        this.chatbot = chatbot;
-    }
-
-
-    public Flux<ChatResponse> stream(ChatRequest request, List<Message> messages, Optional<ChatOptions> options, String model) {
-        return chatbot.stream("1", messages, options);
-    }
+	public Flux<ChatResponse> stream(ChatRequest request, List<Message> messages, Optional<ChatOptions> options,
+			String model) {
+		return chatbot.stream("1", messages, options);
+	}
 
 }

@@ -1,0 +1,15 @@
+spring.ai.mcp.server.name: mcp-server-samples
+spring.ai.mcp.server.version: 0.0.1
+server.port: 7003
+spring:
+  ai:
+    mcp:
+      server:
+        type: async
+
+openapi:
+  urls:
+    # Service "booking" to book a hotel
+    - "http://localhost:11080/v3/api-docs.yaml"
+    # Service "product" to get hotels
+    - "http://localhost:11082/v3/api-docs.yaml"

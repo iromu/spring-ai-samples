@@ -21,61 +21,62 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class OpenApiToolRegistry {
 
-    public record OperationMeta(String operationId, String baseUrl, String path, PathItem.HttpMethod method,
-                                Operation operation) {
-    }
+	public record OperationMeta(String operationId, String baseUrl, String path, PathItem.HttpMethod method,
+			Operation operation) {
+	}
 
-    private final OpenApiConfig openApiConfig;
-    private final Map<String, OperationMeta> operationMap = new ConcurrentHashMap<>();
+	private final OpenApiConfig openApiConfig;
 
-    public OpenApiToolRegistry(OpenApiConfig openApiConfig) {
-        this.openApiConfig = openApiConfig;
-    }
+	private final Map<String, OperationMeta> operationMap = new ConcurrentHashMap<>();
 
-    @PostConstruct
-    public void loadOpenApiFromUrls() {
-        List<String> openApiUrls = openApiConfig.getUrls();
+	public OpenApiToolRegistry(OpenApiConfig openApiConfig) {
+		this.openApiConfig = openApiConfig;
+	}
 
-        for (String url : openApiUrls) {
-            loadAndRegister(url);
-        }
-    }
+	@PostConstruct
+	public void loadOpenApiFromUrls() {
+		List<String> openApiUrls = openApiConfig.getUrls();
 
-    private void loadAndRegister(String swaggerUrl) {
-        SwaggerParseResult result = new io.swagger.v3.parser.OpenAPIV3Parser().readLocation(swaggerUrl, null, null);
-        OpenAPI openAPI = result.getOpenAPI();
+		for (String url : openApiUrls) {
+			loadAndRegister(url);
+		}
+	}
 
-        if (openAPI == null) {
-            throw new RuntimeException("Failed to load OpenAPI from: " + swaggerUrl);
-        }
+	private void loadAndRegister(String swaggerUrl) {
+		SwaggerParseResult result = new io.swagger.v3.parser.OpenAPIV3Parser().readLocation(swaggerUrl, null, null);
+		OpenAPI openAPI = result.getOpenAPI();
 
-        String baseUrl = extractBaseUrl(swaggerUrl);
+		if (openAPI == null) {
+			throw new RuntimeException("Failed to load OpenAPI from: " + swaggerUrl);
+		}
 
-        openAPI.getPaths().forEach((path, pathItem) -> pathItem.readOperationsMap().forEach((method, operation) -> {
-            if (operation.getOperationId() != null) {
-                OperationMeta meta = new OperationMeta(
-                        operation.getOperationId(), baseUrl, path, method, operation
-                );
-                operationMap.put(operation.getOperationId(), meta);
-                log.info("Added {} {} {} {}", baseUrl, method, path, operation.getOperationId());
-            }
-        }));
-    }
+		String baseUrl = extractBaseUrl(swaggerUrl);
 
-    private String extractBaseUrl(String swaggerUrl) {
-        try {
-            URI uri = new URI(swaggerUrl);
-            return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid OpenAPI URL: " + swaggerUrl, e);
-        }
-    }
+		openAPI.getPaths().forEach((path, pathItem) -> pathItem.readOperationsMap().forEach((method, operation) -> {
+			if (operation.getOperationId() != null) {
+				OperationMeta meta = new OperationMeta(operation.getOperationId(), baseUrl, path, method, operation);
+				operationMap.put(operation.getOperationId(), meta);
+				log.info("Added {} {} {} {}", baseUrl, method, path, operation.getOperationId());
+			}
+		}));
+	}
 
-    public Optional<OperationMeta> getOperation(String operationId) {
-        return Optional.ofNullable(operationMap.get(operationId));
-    }
+	private String extractBaseUrl(String swaggerUrl) {
+		try {
+			URI uri = new URI(swaggerUrl);
+			return uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Invalid OpenAPI URL: " + swaggerUrl, e);
+		}
+	}
 
-    public Collection<OperationMeta> listOperations() {
-        return operationMap.values();
-    }
+	public Optional<OperationMeta> getOperation(String operationId) {
+		return Optional.ofNullable(operationMap.get(operationId));
+	}
+
+	public Collection<OperationMeta> listOperations() {
+		return operationMap.values();
+	}
+
 }

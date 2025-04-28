@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/v1")
 public interface OpenAIController {
 
-    @PostMapping(value = "/chat/completions", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    Flux<ChatStreamResponse> chatCompletions(@RequestBody ChatRequest request);
+	@PostMapping(value = "/chat/completions", produces = MediaType.APPLICATION_NDJSON_VALUE)
+	Flux<ChatStreamResponse> chatCompletions(@RequestBody ChatRequest request);
+
 }

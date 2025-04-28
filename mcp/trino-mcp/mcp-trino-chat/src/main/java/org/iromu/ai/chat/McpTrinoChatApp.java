@@ -10,18 +10,19 @@ import org.springframework.context.annotation.Bean;
 @Slf4j
 public class McpTrinoChatApp {
 
-    public static void main(String[] args) {
-        SpringApplication.run(McpTrinoChatApp.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(McpTrinoChatApp.class, args);
+	}
 
-    @Bean
-    public McpAsyncClientCustomizer mcpAsyncClientCustomizer() {
-        return (name, spec) -> {
-            spec.loggingConsumer(logingMessage -> {
-                log.info(logingMessage.data());
-                return null;
-            });
-            log.info("Customizing {}", name);
-        };
-    }
+	@Bean
+	public McpAsyncClientCustomizer mcpAsyncClientCustomizer() {
+		return (name, spec) -> {
+			spec.loggingConsumer(logingMessage -> {
+				log.info(logingMessage.data());
+				return null;
+			});
+			log.info("Customizing {}", name);
+		};
+	}
+
 }

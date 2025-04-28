@@ -11,11 +11,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ToolController {
 
-    private final ToolExecutionService toolExecutionService;
+	private final ToolExecutionService toolExecutionService;
 
-    @PostMapping("/{operationId}")
-    public Mono<String> executeTool(@PathVariable String operationId, @RequestBody Map<String, Object> args) {
-        return toolExecutionService.executeTool(operationId, args)
-                .onErrorResume(e -> Mono.just("Error: " + e.getMessage()));
-    }
+	@PostMapping("/{operationId}")
+	public Mono<String> executeTool(@PathVariable String operationId, @RequestBody Map<String, Object> args) {
+		return toolExecutionService.executeTool(operationId, args)
+			.onErrorResume(e -> Mono.just("Error: " + e.getMessage()));
+	}
+
 }

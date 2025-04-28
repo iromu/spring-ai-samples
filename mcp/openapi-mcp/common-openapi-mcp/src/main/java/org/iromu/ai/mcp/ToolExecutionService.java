@@ -22,71 +22,74 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ToolExecutionService {
 
-    private final WebClient.Builder webClientBuilder;
-    private final OpenApiToolRegistry registry;
+	private final WebClient.Builder webClientBuilder;
 
-    public Mono<String> executeTool(String operationId, Map<String, Object> args) {
-        var metaOpt = registry.getOperation(operationId);
-        if (metaOpt.isEmpty()) {
-            return Mono.error(new IllegalArgumentException("Unknown tool: " + operationId));
-        }
+	private final OpenApiToolRegistry registry;
 
-        var meta = metaOpt.get();
-        HttpMethod method = HttpMethod.valueOf(meta.method().name());
+	public Mono<String> executeTool(String operationId, Map<String, Object> args) {
+		var metaOpt = registry.getOperation(operationId);
+		if (metaOpt.isEmpty()) {
+			return Mono.error(new IllegalArgumentException("Unknown tool: " + operationId));
+		}
 
-        String resolvedPath = resolvePath(meta.path(), args);
-        URI fullUri = buildUriWithQueryParams(meta.baseUrl() + resolvedPath, args, meta.operation());
+		var meta = metaOpt.get();
+		HttpMethod method = HttpMethod.valueOf(meta.method().name());
 
-        WebClient webClient = webClientBuilder.baseUrl(meta.baseUrl()).build();
-        WebClient.RequestBodySpec request = webClient.method(method).uri(fullUri);
+		String resolvedPath = resolvePath(meta.path(), args);
+		URI fullUri = buildUriWithQueryParams(meta.baseUrl() + resolvedPath, args, meta.operation());
 
-        if (meta.operation().getRequestBody() != null) {
-            ObjectNode body = buildJsonBody(meta.operation().getRequestBody(), args);
-            return request.bodyValue(body).retrieve().bodyToMono(String.class);
-        } else {
-            return request.retrieve().bodyToMono(String.class);
-        }
-    }
+		WebClient webClient = webClientBuilder.baseUrl(meta.baseUrl()).build();
+		WebClient.RequestBodySpec request = webClient.method(method).uri(fullUri);
 
-    private String resolvePath(String path, Map<String, Object> args) {
-        Pattern pattern = Pattern.compile("\\{(\\w+)}");
-        Matcher matcher = pattern.matcher(path);
-        StringBuilder result = new StringBuilder();
+		if (meta.operation().getRequestBody() != null) {
+			ObjectNode body = buildJsonBody(meta.operation().getRequestBody(), args);
+			return request.bodyValue(body).retrieve().bodyToMono(String.class);
+		}
+		else {
+			return request.retrieve().bodyToMono(String.class);
+		}
+	}
 
-        while (matcher.find()) {
-            String key = matcher.group(1);
-            Object value = args.getOrDefault(key, "");
-            matcher.appendReplacement(result, Matcher.quoteReplacement(value.toString()));
-        }
+	private String resolvePath(String path, Map<String, Object> args) {
+		Pattern pattern = Pattern.compile("\\{(\\w+)}");
+		Matcher matcher = pattern.matcher(path);
+		StringBuilder result = new StringBuilder();
 
-        matcher.appendTail(result);
-        return result.toString();
-    }
+		while (matcher.find()) {
+			String key = matcher.group(1);
+			Object value = args.getOrDefault(key, "");
+			matcher.appendReplacement(result, Matcher.quoteReplacement(value.toString()));
+		}
 
-    private URI buildUriWithQueryParams(String basePath, Map<String, Object> args, Operation operation) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(basePath);
-        List<Parameter> parameters = operation.getParameters();
-        if (parameters != null) {
-            for (Parameter param : parameters) {
-                if ("query".equals(param.getIn()) && args.containsKey(param.getName())) {
-                    builder.queryParam(param.getName(), args.get(param.getName()));
-                }
-            }
-        }
-        return builder.build().toUri();
-    }
+		matcher.appendTail(result);
+		return result.toString();
+	}
 
-    private ObjectNode buildJsonBody(RequestBody requestBody, Map<String, Object> args) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode json = mapper.createObjectNode();
+	private URI buildUriWithQueryParams(String basePath, Map<String, Object> args, Operation operation) {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(basePath);
+		List<Parameter> parameters = operation.getParameters();
+		if (parameters != null) {
+			for (Parameter param : parameters) {
+				if ("query".equals(param.getIn()) && args.containsKey(param.getName())) {
+					builder.queryParam(param.getName(), args.get(param.getName()));
+				}
+			}
+		}
+		return builder.build().toUri();
+	}
 
-        if (requestBody.getContent().containsKey("application/json")) {
-            requestBody.getContent().get("application/json").getSchema().getProperties().forEach((key, value) -> {
-                if (args.containsKey(key)) {
-                    json.putPOJO((String) key, args.get(key));
-                }
-            });
-        }
-        return json;
-    }
+	private ObjectNode buildJsonBody(RequestBody requestBody, Map<String, Object> args) {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode json = mapper.createObjectNode();
+
+		if (requestBody.getContent().containsKey("application/json")) {
+			requestBody.getContent().get("application/json").getSchema().getProperties().forEach((key, value) -> {
+				if (args.containsKey(key)) {
+					json.putPOJO((String) key, args.get(key));
+				}
+			});
+		}
+		return json;
+	}
+
 }

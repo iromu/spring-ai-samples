@@ -11,18 +11,18 @@ import org.springframework.context.annotation.Bean;
 @Slf4j
 public class McpServerTrinoApp {
 
-    public static void main(String[] args) {
-        SpringApplication.run(McpServerTrinoApp.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(McpServerTrinoApp.class, args);
+	}
 
-    @Bean
-    public ToolCallbackProvider trinoSchemaTools(TrinoSchemaService trinoSchemaService) {
-        return MethodToolCallbackProvider.builder().toolObjects(trinoSchemaService).build();
-    }
+	@Bean
+	public ToolCallbackProvider trinoSchemaTools(TrinoSchemaService trinoSchemaService) {
+		return MethodToolCallbackProvider.builder().toolObjects(trinoSchemaService).build();
+	}
 
-    @Bean
-    public ToolCallbackProvider trinoQueryTools(TrinoQueryService trinoQueryService) {
-        return MethodToolCallbackProvider.builder().toolObjects(trinoQueryService).build();
-    }
+	@Bean
+	public ToolCallbackProvider trinoQueryTools(TrinoQueryService trinoQueryService) {
+		return MethodToolCallbackProvider.builder().toolObjects(trinoQueryService).build();
+	}
 
 }

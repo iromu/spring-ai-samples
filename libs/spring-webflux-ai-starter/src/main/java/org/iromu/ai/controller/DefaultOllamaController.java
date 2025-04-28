@@ -18,95 +18,87 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
- * The DefaultOllamaController implements the OllamaController interface and provides
- * REST endpoints for managing chat operations, retrieving metadata, and model-related
+ * The DefaultOllamaController implements the OllamaController interface and provides REST
+ * endpoints for managing chat operations, retrieving metadata, and model-related
  * information. This controller interacts with the underlying OllamaService to process
  * requests.
  *
- * Constructor:
- * - Initializes the controller with application metadata, model configuration, and the
- *   service dependency.
+ * Constructor: - Initializes the controller with application metadata, model
+ * configuration, and the service dependency.
  *
- * Methods:
- * - getTags: Retrieves a list of tags identifying the current application and model.
- * - getVersion: Provides the version of the application, fetched from build properties.
- * - chat: Handles chat requests by streaming responses from the underlying model service.
- * - chat2: Provides another implementation for streaming chat responses using mock data
- *   for illustrative purposes.
+ * Methods: - getTags: Retrieves a list of tags identifying the current application and
+ * model. - getVersion: Provides the version of the application, fetched from build
+ * properties. - chat: Handles chat requests by streaming responses from the underlying
+ * model service. - chat2: Provides another implementation for streaming chat responses
+ * using mock data for illustrative purposes.
  *
- * Logging:
- * - Uses various log levels (debug, info, trace) to track method executions and output
- *   details of operations.
+ * Logging: - Uses various log levels (debug, info, trace) to track method executions and
+ * output details of operations.
  */
 @Slf4j
 public class DefaultOllamaController implements OllamaController {
 
-    private final Optional<BuildProperties> buildProperties;
-    private final String appName;
-    private final String model;
-    private final OllamaService ollamaService;
+	private final Optional<BuildProperties> buildProperties;
 
-    public DefaultOllamaController(
-            Optional<BuildProperties> buildProperties,
-            @Value("${spring.application.name}") String appName,
-            @Value("${spring.ai.ollama.chat.options.model}") String model, OllamaService ollamaService
-    ) {
+	private final String appName;
 
-        this.buildProperties = buildProperties;
-        this.appName = appName;
-        this.model = model;
-        this.ollamaService = ollamaService;
-    }
+	private final String model;
 
-    @Override
-    public Mono<TagsResponse> getTags() {
-        ModelTag modelTag = new ModelTag(appName + "/" + model, null);
-        log.debug("Default getTags() {}", modelTag);
-        return Mono.just(new TagsResponse(
-                List.of(
-                        modelTag
-                )
-        ));
-    }
+	private final OllamaService ollamaService;
 
-    @Override
-    public Mono<VersionResponse> getVersion() {
-        String version = buildProperties.isPresent() ? buildProperties.get().getVersion() : "0.0.0";
-        log.info("Default getVersion() {}", version);
-        return Mono.just(new VersionResponse(version));
-    }
+	public DefaultOllamaController(Optional<BuildProperties> buildProperties,
+			@Value("${spring.application.name}") String appName,
+			@Value("${spring.ai.ollama.chat.options.model}") String model, OllamaService ollamaService) {
 
-    @Override
-    public Flux<ChatStreamResponse> chat(@RequestBody ChatRequest request) {
-        log.info("Chat request tokens: {}", request.countTotalTokens());
+		this.buildProperties = buildProperties;
+		this.appName = appName;
+		this.model = model;
+		this.ollamaService = ollamaService;
+	}
 
-        List<Message> messages = RequestUtils.getMessages(request);
-        Optional<ChatOptions> options = RequestUtils.getOptions(request);
+	@Override
+	public Mono<TagsResponse> getTags() {
+		ModelTag modelTag = new ModelTag(appName + "/" + model, null);
+		log.debug("Default getTags() {}", modelTag);
+		return Mono.just(new TagsResponse(List.of(modelTag)));
+	}
 
-        String model = request.model().replace(appName + "/", "");
-        return ollamaService.stream(request, messages, options, model).map(chatResponse -> {
+	@Override
+	public Mono<VersionResponse> getVersion() {
+		String version = buildProperties.isPresent() ? buildProperties.get().getVersion() : "0.0.0";
+		log.info("Default getVersion() {}", version);
+		return Mono.just(new VersionResponse(version));
+	}
 
-            String message = chatResponse.getResult().getOutput().getText();
-            Instant createdAt = chatResponse.getMetadata().get("created-at");
-            Integer promptEvalCount = chatResponse.getMetadata().get("prompt-eval-count");
-            Integer evalCount = chatResponse.getMetadata().get("eval-count");
+	@Override
+	public Flux<ChatStreamResponse> chat(@RequestBody ChatRequest request) {
+		log.info("Chat request tokens: {}", request.countTotalTokens());
 
-            return new ChatStreamResponse.Builder()
-                    .model(request.model())
-                    .createdAt(createdAt.toString())
-                    .message(new ChatMessage(MessageType.ASSISTANT.getValue(), message, null))
-                    .done(false)
-                    .totalDuration(4883583458L)
-                    .loadDuration(1334875L)
-                    .promptEvalCount(promptEvalCount)
-                    .promptEvalDuration(342546000L)
-                    .evalCount(evalCount)
-                    .evalDuration(4535599000L)
-                    .build();
-        });
+		List<Message> messages = RequestUtils.getMessages(request);
+		Optional<ChatOptions> options = RequestUtils.getOptions(request);
 
-    }
+		String model = request.model().replace(appName + "/", "");
+		return ollamaService.stream(request, messages, options, model).map(chatResponse -> {
+
+			String message = chatResponse.getResult().getOutput().getText();
+			Instant createdAt = chatResponse.getMetadata().get("created-at");
+			Integer promptEvalCount = chatResponse.getMetadata().get("prompt-eval-count");
+			Integer evalCount = chatResponse.getMetadata().get("eval-count");
+
+			return new ChatStreamResponse.Builder().model(request.model())
+				.createdAt(createdAt.toString())
+				.message(new ChatMessage(MessageType.ASSISTANT.getValue(), message, null))
+				.done(false)
+				.totalDuration(4883583458L)
+				.loadDuration(1334875L)
+				.promptEvalCount(promptEvalCount)
+				.promptEvalDuration(342546000L)
+				.evalCount(evalCount)
+				.evalDuration(4535599000L)
+				.build();
+		});
+
+	}
 
 }
