@@ -11,7 +11,7 @@
 
     <artifactId>mcp-server-trino</artifactId>
     <properties>
-        <trino-jdbc.version>474</trino-jdbc.version>
+        <trino-jdbc.version>475</trino-jdbc.version>
     </properties>
     <dependencies>
         <dependency>
