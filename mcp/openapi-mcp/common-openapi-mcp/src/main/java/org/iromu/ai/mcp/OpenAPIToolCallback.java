@@ -54,6 +54,7 @@ public class OpenAPIToolCallback implements ToolCallback {
 
 	@Override
 	public String call(String toolInput, ToolContext tooContext) {
+		log.info("{} {}", toolInput, tooContext);
 		return call(toolInput);
 	}
 

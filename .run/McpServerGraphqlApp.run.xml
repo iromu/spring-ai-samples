@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="McpServerGraphqlApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="MCP GraphQL" nameIsGenerated="true">
+        <module name="mcp-server-graphql"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.mcp.McpServerGraphqlApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

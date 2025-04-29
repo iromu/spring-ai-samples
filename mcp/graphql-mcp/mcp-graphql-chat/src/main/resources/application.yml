@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: mcp-graphql-chat
+  ai:
+    ollama:
+      chat:
+        options:
+          model: llama3.1:8b
+    mcp:
+      client:
+        type: async
+        sse:
+          connections:
+            mcp-server-graphql:
+              url: http://localhost:7004
+
+server:
+  port: 7776
+
+spring.profiles.active: local

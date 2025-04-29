@@ -13,7 +13,10 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>common-graphql-mcp</module>
         <module>sample-graphql-services</module>
+        <module>mcp-graphql-chat</module>
+        <module>mcp-server-graphql</module>
     </modules>
 
 </project>

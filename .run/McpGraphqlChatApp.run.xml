@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="McpGraphqlChatApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="MCP GraphQL" nameIsGenerated="true">
+        <module name="mcp-graphql-chat"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.chat.McpGraphqlChatApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>
