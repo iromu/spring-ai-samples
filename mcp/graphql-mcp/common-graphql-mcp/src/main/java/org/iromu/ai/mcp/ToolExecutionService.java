@@ -47,7 +47,7 @@ public class ToolExecutionService {
 		String argString = buildGraphQLArgs(args);
 		String selectionSet = buildSelectionSet(fieldDef.getType());
 		return "{\"query\":\"{ " + fieldDef.getName()
-				+ (argString.isEmpty() ? "" : "(" + argString.replaceAll("\"", "\\\"") + ")")
+				+ (argString.isEmpty() ? "" : "(" + argString.replaceAll("\"", "\\\\\"") + ")")
 				+ (selectionSet.isEmpty() ? "" : " " + selectionSet) + " }\"}";
 	}
 
