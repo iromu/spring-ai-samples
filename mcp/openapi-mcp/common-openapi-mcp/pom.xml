@@ -16,6 +16,11 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.iromu.ai</groupId>
+            <artifactId>spring-common-ai-starter</artifactId>
+            <version>${revision}${sha1}${changelist}</version>
+        </dependency>
         <!-- OpenAPI Parser -->
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>

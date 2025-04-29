@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="SpringAIGatewayApplication" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="UI" nameIsGenerated="true">
+        <module name="ai-gateway"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.gateway.SpringAIGatewayApplication"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

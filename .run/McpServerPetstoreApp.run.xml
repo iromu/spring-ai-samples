@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="McpServerPetstoreApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="MCP OpenApi" nameIsGenerated="true">
+        <module name="mcp-server-petstore"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.mcp.McpServerPetstoreApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

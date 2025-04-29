@@ -1,8 +1,5 @@
 package org.iromu.ai.autoconfigure;
 
-import org.iromu.ai.config.RestClientConfiguration;
-import org.iromu.ai.config.WebClientConfig;
-import org.iromu.ai.config.WebClientProperties;
 import org.iromu.ai.controller.DefaultOllamaController;
 import org.iromu.ai.controller.OllamaController;
 import org.iromu.ai.service.OllamaService;
@@ -11,7 +8,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
 
@@ -37,7 +33,6 @@ import java.util.Optional;
  * the context.
  */
 @AutoConfiguration
-@Import({ WebClientProperties.class, WebClientConfig.class, RestClientConfiguration.class })
 public class SpringAiWebfluxAutoConfiguration {
 
 	/**

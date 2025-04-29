@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>spring-webflux-ai-starter</module>
+        <module>spring-common-ai-starter</module>
     </modules>
 
 

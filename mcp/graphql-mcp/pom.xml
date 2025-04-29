@@ -5,16 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.iromu.ai</groupId>
-        <artifactId>spring-ai-samples</artifactId>
+        <artifactId>mcp</artifactId>
         <version>${revision}${sha1}${changelist}</version>
     </parent>
 
-    <artifactId>mcp</artifactId>
+    <artifactId>graphql-mcp</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>openapi-mcp</module>
-        <module>trino-mcp</module>
-        <module>graphql-mcp</module>
+        <module>sample-graphql-services</module>
     </modules>
+
 </project>

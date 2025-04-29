@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="GeminiChatApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="CHAT" nameIsGenerated="true">
+        <module name="gemini-chat"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.chat.GeminiChatApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

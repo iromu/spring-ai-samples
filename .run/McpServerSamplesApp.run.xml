@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="McpServerSamplesApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="MCP OpenApi" nameIsGenerated="true">
+        <module name="mcp-server-samples"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.mcp.McpServerSamplesApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

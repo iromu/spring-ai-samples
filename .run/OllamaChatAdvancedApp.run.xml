@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="OllamaChatAdvancedApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="CHAT" nameIsGenerated="true">
+        <module name="ollama-chat-advanced"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.chat.OllamaChatAdvancedApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

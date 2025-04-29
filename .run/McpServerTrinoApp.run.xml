@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="McpServerTrinoApp" type="SpringBootApplicationConfigurationType"
+                 factoryName="Spring Boot" folderName="MCP Trino" nameIsGenerated="true">
+    <module name="mcp-server-trino"/>
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.ai.mcp.McpServerTrinoApp"/>
+    <method v="2">
+      <option name="Make" enabled="true"/>
+    </method>
+  </configuration>
+</component>

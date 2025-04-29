@@ -1,4 +1,4 @@
-spring.ai.mcp.server.name: mcp-server-openapi
+spring.ai.mcp.server.name: mcp-server-petstore
 spring.ai.mcp.server.version: 0.0.1
 server.port: 7002
 spring:

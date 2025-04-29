@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="OpenApiProductApp" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot" folderName="MCP OpenApi" nameIsGenerated="true">
+        <module name="ecommerce-product"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="org.iromu.openapi.OpenApiProductApp"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

@@ -27,10 +27,8 @@ services:
   ai-gateway:
     container_name: ai-gateway
     image: iromu/ai-gateway:latest
-    environment:
-      VITE_OLLAMA: http://localhost:11888
     ports:
-      - "3000:80"
+      - "11888:80"
 
   mini-chat-ui:
     container_name: mini-chat-ui
