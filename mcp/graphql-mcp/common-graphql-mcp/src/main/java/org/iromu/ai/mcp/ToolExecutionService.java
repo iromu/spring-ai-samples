@@ -51,6 +51,7 @@ public class ToolExecutionService {
 				+ (selectionSet.isEmpty() ? "" : " " + selectionSet) + " }\"}";
 	}
 
+
 	private String buildGraphQLArgs(Map<String, Object> args) {
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, Object> entry : args.entrySet()) {
