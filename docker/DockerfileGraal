@@ -4,7 +4,7 @@ FROM ghcr.io/graalvm/native-image-community:23 AS bootstrap-stage
 RUN microdnf install -y freetype-devel; microdnf clean all
 
 COPY ./scripts/health-check.sh /health-check.sh
-
+RUN chmod +x /health-check.sh
 
 FROM bootstrap-stage AS cache-stage
 
@@ -40,13 +40,8 @@ RUN ls -lah ${APP_PATH}/target/
 FROM oraclelinux:9-slim
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
-#RUN microdnf install -y tzdata openssl ca-certificates fontconfig glibc-langpack-en gzip tar \
-#    ; microdnf clean all
-
-#  Factory method 'client' threw exception with message: /tmp/lib3041497491263798892libyggdrasilffi_x86_64-musl.so:
-# Error loading shared library libgcc_s.so.1: No such file or directory (needed by /tmp/lib3041497491263798892libyggdrasilffi_x86_64-musl.so)
-RUN microdnf install -y libgcc \
-    ; microdnf clean all
+RUN microdnf install -y libgcc
+RUN microdnf clean all
 
 ARG APP_PATH
 ARG NAME
@@ -59,7 +54,6 @@ COPY --from=build-stage /app/${APP_PATH}/target/${NAME} /app/${NAME}
 COPY --from=build-stage /app/${APP_PATH}/target/*.so /app/
 COPY --from=bootstrap-stage /health-check.sh /health-check.sh
 
-RUN chmod +x /health-check.sh
 
 ENV EXEC_PATH=/app/${NAME}
 COPY ./scripts/docker-cmd-run-native.sh /app/run.sh
@@ -68,3 +62,6 @@ RUN ls -lah /app
 RUN cat /app/run.sh
 
 CMD ["/app/run.sh"]
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s \
+  CMD /health-check.sh || exit 1

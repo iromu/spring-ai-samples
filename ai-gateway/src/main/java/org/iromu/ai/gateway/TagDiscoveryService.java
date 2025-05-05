@@ -63,6 +63,7 @@ public class TagDiscoveryService {
 	}
 
 	private Flux<MetaTagResponse> discoverOnce() {
+		log.info("Discovering tags from {}", urls);
 		this.tags = Flux.fromIterable(urls).flatMap(url -> {
 			log.debug("Discovering tags from {}/api/tags", url);
 			return webClientBuilder.baseUrl(url)

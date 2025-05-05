@@ -95,4 +95,5 @@ public class GraphQLToolRegistry {
 			return new InputStreamReader(resource.getInputStream());
 		}
 	}
+
 }

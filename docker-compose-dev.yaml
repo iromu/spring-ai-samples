@@ -1,0 +1,93 @@
+services:
+  redis-stack-server:
+    container_name: redis-stack-server
+    image: redis/redis-stack-server:latest
+    ports:
+      - "9736:6379"
+
+  postgres-samples:
+    container_name: postgres-samples
+    image: postgres:alpine
+    volumes:
+      - ./docker/postgres/data:/data
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: example
+    ports:
+      - "5432:5432"
+
+  trino:
+    container_name: trino
+    image: trinodb/trino:latest
+    ports:
+      - "8384:8080"
+    volumes:
+      - ./docker/trino/etc:/etc/trino
+
+  graphql-trino:
+    container_name: graphql-trino
+    image: iromu/graphql-trino:latest
+    ports:
+      - "8886:8080"
+    volumes:
+      - ./docker/graphql-trino/etc:/etc/graphql-trino
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:trino://trino:8080
+    depends_on:
+      trino:
+        condition: service_healthy
+        restart: true
+
+  petstore:
+    container_name: petstore
+    image: openapitools/openapi-petstore
+    ports:
+      - "8334:8080"
+    environment:
+      SWAGGER_HOST: http://localhost:8334
+      SWAGGER_URL: http://localhost:8334
+      SWAGGER_BASE_PATH: /v3
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "8000:8080"
+    environment:
+      WEBUI_AUTH: False
+      OLLAMA_BASE_URL: http://host.docker.internal:11888
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+# 1. This is SLOW
+# First time boot needs to download 'llama3' model, 4.7 GB. If docker compose is started by Spring it will fail and stop the container.
+# You have to manually start this container and wait for the model to download.
+#
+# 2. On EVERY application restart (with docker compose), ollama will load again the model into memory.
+# This makes the rest endpoints "hang" until the next message shows on docker:
+# msg="llama runner started in 149.95 seconds"
+
+#  ollama:
+#    image: ollama/ollama:latest
+#    container_name: ollama
+#    volumes:
+#      - ./.ollama:/root/.ollama
+#    tty: true
+#    entrypoint: [ "/usr/bin/bash", "/root/.ollama/ollama.sh" ]
+#    ports:
+#      - 11434
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [ gpu ]
+
+
+volumes:
+  open-webui:

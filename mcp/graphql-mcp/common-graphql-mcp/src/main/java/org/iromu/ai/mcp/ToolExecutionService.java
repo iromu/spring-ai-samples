@@ -14,6 +14,7 @@ import java.util.Map;
 public class ToolExecutionService {
 
 	private final WebClient.Builder webClientBuilder;
+
 	private final GraphQLToolRegistry graphQLRegistry;
 
 	public ToolExecutionService(WebClient.Builder webClientBuilder, GraphQLToolRegistry graphQLRegistry) {
@@ -50,7 +51,6 @@ public class ToolExecutionService {
 				+ (argString.isEmpty() ? "" : "(" + argString.replaceAll("\"", "\\\\\"") + ")")
 				+ (selectionSet.isEmpty() ? "" : " " + selectionSet) + " }\"}";
 	}
-
 
 	private String buildGraphQLArgs(Map<String, Object> args) {
 		StringBuilder sb = new StringBuilder();
@@ -111,4 +111,5 @@ public class ToolExecutionService {
 		}
 		return type;
 	}
+
 }

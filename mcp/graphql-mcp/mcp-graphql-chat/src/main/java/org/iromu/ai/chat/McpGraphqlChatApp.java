@@ -21,6 +21,7 @@ public class McpGraphqlChatApp {
 				log.info(logingMessage.data());
 				return null;
 			});
+
 			log.info("Customizing {}", name);
 		};
 	}

@@ -38,6 +38,7 @@ Function buildx
     if ($dockerfile -eq "./docker/DockerfileGraal")
     {
         $path = '.'
+        $tags = "-t ${VERSION_IMAGE_NAME} -t ${LATEST_IMAGE_NAME} -t ${VERSION_IMAGE_NAME}-native -t ${LATEST_IMAGE_NAME}-native"
     }
 
     if ($selectedPlatform)
@@ -67,7 +68,7 @@ Function buildx
     Start-Sleep -Seconds 2.5
 }
 
-Function dockerBuild
+Function dockerBuildAlpine
 {
     Param ($path, $name, [string] $selectedPlatform)
     $container = $name
@@ -77,7 +78,7 @@ Function dockerBuild
     buildx $name $path $dockerfile $container $version $platform
 }
 
-Function dockerBuildNodeWorkspace
+Function dockerBuild
 {
     Param ($path, $name, [string] $selectedPlatform)
     $container = $name

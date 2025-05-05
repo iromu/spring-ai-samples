@@ -20,7 +20,7 @@ public class GraphQLSchemaRestController {
 	@GetMapping("/schema.graphql")
 	public String getSchema() {
 		try {
-			Resource schemaResource = resourceLoader.getResource("classpath:graphql/schema.graphqls");
+			Resource schemaResource = resourceLoader.getResource("classpath:/graphql/schema.graphqls");
 			byte[] schemaBytes = Files.readAllBytes(schemaResource.getFile().toPath());
 			return new String(schemaBytes, StandardCharsets.UTF_8);
 		}

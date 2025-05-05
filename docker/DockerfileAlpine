@@ -42,10 +42,13 @@ RUN chmod +x run.sh
 
 ENV SPRING_PROFILES_ACTIVE=base,docker
 
-ADD https://gist.githubusercontent.com/iromu/2bca8255f4954a93d92055d557a740fa/raw/b61f4e48e42a1558b643c1095e3ac5a0ff24e37f/health-check.sh /health-check.sh
+ADD https://gist.githubusercontent.com/iromu/2bca8255f4954a93d92055d557a740fa/raw/ca45948142e025e15a2ad87f90a0e2e674c8bd52/health-check.sh /health-check.sh
+
 RUN chmod +x /health-check.sh
 
 ENV JAVA_OPTS="-XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Xss512k -Xms64M -Xmx150M "
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD /health-check.sh || exit 1
 
 CMD ["/app/run.sh"]
 

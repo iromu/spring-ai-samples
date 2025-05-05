@@ -1,0 +1,155 @@
+services:
+  redis-stack-server:
+    container_name: redis-stack-server
+    image: redis/redis-stack-server:latest
+    ports:
+      - "9736:6379"
+
+  trino:
+    container_name: trino
+    image: trinodb/trino:latest
+    ports:
+      - "8384:8080"
+    volumes:
+      - ./docker/trino/etc:/etc/trino
+
+  postgres-samples:
+    container_name: postgres-samples
+    build:
+      context: ./docker/postgres
+    ports:
+      - "5432:5432"
+
+  petstore:
+    container_name: petstore
+    image: openapitools/openapi-petstore
+    ports:
+      - "8334:8080"
+    environment:
+      SWAGGER_HOST: http://localhost:8334
+      SWAGGER_URL: http://localhost:8334
+      SWAGGER_BASE_PATH: /v3
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+    ports:
+      - "8000:8080"
+    environment:
+      WEBUI_AUTH: False
+      OLLAMA_BASE_URL: http://host.docker.internal:11888
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ai-gateway:
+    container_name: ai-gateway
+    image: iromu/ai-gateway:latest
+    ports:
+      - "11888:80"
+    environment:
+      AI_URLS: http://ollama-chat
+
+  mini-chat-ui:
+    container_name: mini-chat-ui
+    image: iromu/mini-chat-ui:latest
+    environment:
+      VITE_OLLAMA: http://localhost:11888
+    ports:
+      - "3000:80"
+
+  graphql-book:
+    container_name: graphql-book
+    image: iromu/graphql-book:latest
+
+  mcp-server-graphql:
+    container_name: mcp-server-graphql
+    image: iromu/mcp-server-graphql:latest
+    environment:
+      GRAPHQL_SCHEMAS: "http://graphql-book/schema.graphql"
+    depends_on:
+      graphql-book:
+        condition: service_healthy
+        restart: true
+
+  mcp-graphql-chat:
+    container_name: mcp-graphql-chat
+    image: iromu/mcp-graphql-chat:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+      SPRING_AI_MCP_CLIENT_SSE_CONNECTIONS_MCP-SERVER-GRAPHQL_URL: http://mcp-server-graphql
+    depends_on:
+      mcp-server-graphql:
+        condition: service_healthy
+        restart: true
+
+  ecommerce-booking:
+    container_name: ecommerce-booking
+    image: iromu/ecommerce-booking:latest
+
+  ecommerce-product:
+    container_name: ecommerce-product
+    image: iromu/ecommerce-product:latest
+
+  mcp-server-samples:
+    container_name: mcp-server-samples
+    image: iromu/mcp-server-samples:latest
+    depends_on:
+      ecommerce-booking:
+        condition: service_healthy
+        restart: true
+      ecommerce-product:
+        condition: service_healthy
+        restart: true
+
+  mcp-openapi-chat:
+    container_name: mcp-openapi-chat
+    image: iromu/mcp-openapi-chat:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+    depends_on:
+      mcp-server-samples:
+        condition: service_healthy
+        restart: true
+
+  ollama-chat:
+    container_name: ollama-chat
+    image: iromu/ollama-chat:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+
+  ollama-chat-advanced:
+    container_name: ollama-chat-advanced
+    image: iromu/ollama-chat-advanced:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+
+# 1. This is SLOW
+# First time boot needs to download 'llama3' model, 4.7 GB. If docker compose is started by Spring it will fail and stop the container.
+# You have to manually start this container and wait for the model to download.
+#
+# 2. On EVERY application restart (with docker compose), ollama will load again the model into memory.
+# This makes the rest endpoints "hang" until the next message shows on docker:
+# msg="llama runner started in 149.95 seconds"
+
+#  ollama:
+#    image: ollama/ollama:latest
+#    container_name: ollama
+#    volumes:
+#      - ./.ollama:/root/.ollama
+#    tty: true
+#    entrypoint: [ "/usr/bin/bash", "/root/.ollama/ollama.sh" ]
+#    ports:
+#      - 11434
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [ gpu ]
+
+
+volumes:
+  open-webui:

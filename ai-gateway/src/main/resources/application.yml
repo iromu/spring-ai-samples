@@ -29,3 +29,11 @@ management.endpoint.gateway.enabled: true # default value
 management.endpoints.web.exposure.include: gateway
 
 spring.profiles.active: local
+
+management.endpoint.health.probes.enabled: true
+management.health.livenessState.enabled: true
+management.health.readinessState.enabled: true
+
+---
+spring.config.activate.on-profile: docker
+server.port: 80
