@@ -9,7 +9,9 @@ spring:
 
 graphql:
   schemas:
+    # Book GraphQL API (mcp/graphql-mcp/sample-graphql-services/graphql-book)
     - "http://localhost:11180/schema.graphql"
+    # Trino GrapqhQL API (docker)
     - "http://localhost:8886/schema.graphqls"
 
 management.endpoint.health.probes.enabled: true
