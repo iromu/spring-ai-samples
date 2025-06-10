@@ -1,12 +1,10 @@
 services:
   redis-stack-server:
-    container_name: redis-stack-server
     image: redis/redis-stack-server:latest
     ports:
       - "9736:6379"
 
   postgres-samples:
-    container_name: postgres-samples
     image: postgres:alpine
     volumes:
       - ./docker/postgres/data:/data
@@ -19,7 +17,6 @@ services:
       - "5432:5432"
 
   trino:
-    container_name: trino
     image: trinodb/trino:latest
     ports:
       - "8384:8080"
@@ -27,7 +24,6 @@ services:
       - ./docker/trino/etc:/etc/trino
 
   graphql-trino:
-    container_name: graphql-trino
     image: iromu/graphql-trino:latest
     ports:
       - "8886:8080"
@@ -41,7 +37,6 @@ services:
         restart: true
 
   petstore:
-    container_name: petstore
     image: openapitools/openapi-petstore
     ports:
       - "8334:8080"
@@ -52,7 +47,6 @@ services:
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
     volumes:
       - open-webui:/app/backend/data
     ports:

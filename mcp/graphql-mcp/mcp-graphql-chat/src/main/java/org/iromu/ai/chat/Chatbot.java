@@ -4,7 +4,8 @@ import io.modelcontextprotocol.client.McpAsyncClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -13,8 +14,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
-
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 
 @Component
 @Slf4j
@@ -30,7 +29,9 @@ class Chatbot {
 		}
 
 		var mcpToolProvider = new AsyncMcpToolCallbackProvider(mcpClients);
-		MessageChatMemoryAdvisor memoryAdvisor = new MessageChatMemoryAdvisor(new InMemoryChatMemory());
+		MessageChatMemoryAdvisor memoryAdvisor = MessageChatMemoryAdvisor
+			.builder(MessageWindowChatMemory.builder().build())
+			.build();
 		ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
 			.defaultTools(mcpToolProvider)
 			.defaultAdvisors(memoryAdvisor);
@@ -40,7 +41,7 @@ class Chatbot {
 
 	public Flux<ChatResponse> stream(String id, List<Message> messages) {
 		return chatClient.prompt(messages.getLast().getText())
-			.advisors(advisorSpec -> advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, id))
+			.advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, id))
 			.stream()
 			.chatResponse();
 	}

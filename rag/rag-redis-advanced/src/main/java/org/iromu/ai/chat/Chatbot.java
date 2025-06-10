@@ -8,6 +8,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQueryTransformer;
@@ -61,7 +62,10 @@ class Chatbot {
 		SearchRequest searchRequest = SearchRequest.builder().build();
 		chatClientBuilder = ChatClient.builder(chatModel)
 			.defaultOptions(options)
-			.defaultAdvisors(new QuestionAnswerAdvisor(vectorStore, searchRequest, SYSTEM_PROMPT_TEMPLATE));
+			.defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
+				.searchRequest(searchRequest)
+				.promptTemplate(PromptTemplate.builder().template(SYSTEM_PROMPT_TEMPLATE).build())
+				.build());
 		this.chatClient = chatClientBuilder.build();
 
 	}
