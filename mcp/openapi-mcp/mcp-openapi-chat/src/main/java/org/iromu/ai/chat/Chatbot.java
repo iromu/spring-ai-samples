@@ -33,7 +33,7 @@ class Chatbot {
 			.builder(MessageWindowChatMemory.builder().build())
 			.build();
 		ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
-			.defaultTools(mcpToolProvider)
+				.defaultToolCallbacks(mcpToolProvider)
 			.defaultAdvisors(memoryAdvisor);
 		this.chatClient = chatClientBuilder.build();
 		log.info("Chatbot built");

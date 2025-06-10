@@ -35,7 +35,7 @@ class Chatbot {
 			.build();
 		SimpleLoggerAdvisor simpleLoggerAdvisor = new SimpleLoggerAdvisor();
 		ChatClient.Builder chatClientBuilder = ChatClient.builder(chatModel)
-			.defaultTools(mcpToolProvider)
+				.defaultToolCallbacks(mcpToolProvider)
 			.defaultAdvisors(memoryAdvisor, simpleLoggerAdvisor);
 		this.chatClient = chatClientBuilder.build();
 		log.info("Chatbot built");
