@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  redis-stack-server:
+    image: redis/redis-stack-server:latest
+
+  postgres-samples:
+    image: iromu/postgres-samples:latest
+
+  petstore:
+    image: openapitools/openapi-petstore
+    environment:
+      SWAGGER_HOST: http://localhost:8334
+      SWAGGER_URL: http://localhost:8334
+      SWAGGER_BASE_PATH: /v3
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      WEBUI_AUTH: "false"
+      OLLAMA_BASE_URL: http://host.docker.internal:11888
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ai-gateway:
+    image: iromu/ai-gateway:latest
+    ports:
+      - "11888:80"
+    environment:
+      AI_URLS: http://ollama-chat
+
+  mini-chat-ui:
+    image: iromu/mini-chat-ui:latest
+    environment:
+      VITE_OLLAMA: http://localhost:11888
+
+  graphql-book:
+    image: iromu/graphql-book:latest
+
+  mcp-server-graphql:
+    image: iromu/mcp-server-graphql:latest
+    environment:
+      GRAPHQL_SCHEMAS: "http://graphql-book/schema.graphql"
+
+  mcp-graphql-chat:
+    image: iromu/mcp-graphql-chat:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+      SPRING_AI_MCP_CLIENT_SSE_CONNECTIONS_MCP-SERVER-GRAPHQL_URL: http://mcp-server-graphql
+
+  ecommerce-booking:
+    image: iromu/ecommerce-booking:latest
+
+  ecommerce-product:
+    image: iromu/ecommerce-product:latest
+
+  mcp-server-samples:
+    image: iromu/mcp-server-samples:latest
+
+  mcp-openapi-chat:
+    image: iromu/mcp-openapi-chat:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+
+  ollama-chat:
+    image: iromu/ollama-chat:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+
+  ollama-chat-advanced:
+    image: iromu/ollama-chat-advanced:latest
+    environment:
+      SPRING_AI_OLLAMA_BASEURL: http://host.docker.internal:11434
+
+volumes:
+  open-webui:
+
+networks:
+  core-infra:
+    external: true
